@@ -1,4 +1,4 @@
-package Beast;
+package Main;
 
 public class Beast {
     //Skill system

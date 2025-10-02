@@ -1,4 +1,4 @@
-package Combat;
+package Main;
 
 public class Combat {
     //Battle mechanics

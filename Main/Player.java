@@ -1,4 +1,4 @@
-package Player;
+package Main;
 
 public class Player {
     //progression
