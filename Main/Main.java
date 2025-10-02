@@ -59,6 +59,7 @@ public class Main{
         int character2 = sc.nextInt();
         System.out.print("Choose your third character: ");
         int character3 = sc.nextInt();
+        System.out.print("Hello");
     }
 
 }
