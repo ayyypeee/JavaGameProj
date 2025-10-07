@@ -3,7 +3,7 @@ package Main;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MechaBeast {
+public class MechaBeast<Skill> {
     private final String name;
     private final ElementType type;
     private final String henshin;
