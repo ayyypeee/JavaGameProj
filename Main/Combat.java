@@ -37,7 +37,7 @@ public class Combat {
             if (!player.isAlive()) {
                 break; 
             }
-        }ss
+        }
 
         checkOutcome();
     }
