@@ -169,7 +169,7 @@ public class StoryManager {
             playStage1Ending();
         }
 
-          */
+          
     }
 
     private void playStage1Ending() {

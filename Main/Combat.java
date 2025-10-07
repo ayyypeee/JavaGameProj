@@ -1,6 +1,5 @@
 package Main;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Combat {
     // initialize participants
@@ -8,7 +7,6 @@ public class Combat {
     private MechaBeast enemy;
     private boolean playerWon;
 
-    private Scanner sc = new Scanner(System.in);
     private Random rand = new Random();
 
     public Combat(MechaBeast player, MechaBeast enemy) {
@@ -55,14 +53,13 @@ public class Combat {
     //Battle UIs
     private void playerTurn() {
         System.out.println("\nYOUR BEAST!");
-
         takeDamage(enemy, calculateDamage(player, enemy));
 
     }
 
     private void enemyTurn() {
         System.out.println("\nENEMY'S TURN!");
-        int randomSkill = rand.nextInt(3) + 1;  // 1–3
+        takeDamage(enemy, calculateDamage(player, enemy));
     }
 
     public void takeDamage(MechaBeast beast, int damage) {
@@ -84,3 +81,4 @@ public class Combat {
     }
 
   //Skill cooldown and mana management
+}
