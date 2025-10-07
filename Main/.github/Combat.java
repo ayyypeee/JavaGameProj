@@ -2,7 +2,7 @@ package Main;
 
 public class Combat {
     //Battle mechanics
-    
+          
     //Damage calculations
 
     //Battle UI
