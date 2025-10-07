@@ -3,7 +3,7 @@ package Main;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MechaBeast<Skill> {
+public class MechaBeast {
     private final String name;
     private final ElementType type;
     private final String henshin;
@@ -30,6 +30,14 @@ public class MechaBeast<Skill> {
         if (skills.size() < 3) {
             skills.add(skill);
         }
+    }
+
+    // setter & getter for currentHp (since no Skill class yet)
+    public void setCurrentHp(int hp) {
+        this.currentHp = hp;
+    }
+    public int getCurrentHp() {
+        return currentHp;
     }
 
     public String getName() {
@@ -152,6 +160,8 @@ enum ElementType {
             case STEEL:
                 if (defenderType == DARK || defenderType == ELECTRIC) return 2.0;
                 if (defenderType == FIRE || defenderType == EARTH) return 0.5;
+                break;
+            default:
                 break;
         }
 

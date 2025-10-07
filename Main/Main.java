@@ -33,6 +33,7 @@ public class Main {
         // Introduction
         storyManager.playIntroduction();
 
+        /*
         // Beast Selection
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║      SELECT YOUR MECHA BEASTS          ║");
@@ -43,6 +44,7 @@ public class Main {
 
         List<MechaBeast> availableBeasts = MechaBeastFactory.getAllStarterBeasts();
 
+        
         // Display Beast Selection Table
         System.out.println("┌────┬─────────────┬──────────┬──────┬───────┬───────┐");
         System.out.println("│ #  │ Name        │ Type     │  HP  │ Speed │ Mana  │");
@@ -179,12 +181,13 @@ public class Main {
         System.out.println("║         YOUR TEAM IS READY!            ║");
         System.out.println("╚════════════════════════════════════════╝");
 
+
         System.out.println("\nYour team:");
         for (int i = 0; i < player.getMechaBeasts().size(); i++) {
             MechaBeast beast = player.getMechaBeasts().get(i);
             System.out.printf("%d. %s (%s)%n", (i + 1), beast.getName(), beast.getType().getDisplayName());
         }
-
+        */
         System.out.println("\nProfessor Ai-P: Excellent choices! Now let's begin the test!");
         System.out.println("\n[Press ENTER to continue]");
         scanner.nextLine();

@@ -29,6 +29,10 @@ public class Player {
         return mechaBeasts;
     }
 
+    public MechaBeast getActiveBeast() {
+        return mechaBeasts.get(0); // For simplicity, always return the first beast
+    }
+
 
     //progression
     //Player.Player statistics

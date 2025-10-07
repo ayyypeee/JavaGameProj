@@ -107,17 +107,19 @@ public class StoryManager {
         System.out.println("You encountered a Mecha Beast!");
 
       // Tutorial battle sequence
-        //condition if madaug sa tutorial
-        /*
+        // Initialize player's MechaBeast to Kingmantis 
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createVineratops());
 
-        if () {
+        fight.begin();
+
+        if (fight.getOutcome()) {
             System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
             System.out.println("You may now continue.");
             System.out.println(player.getName() + " (catching breath): That... felt too real.");
 
             playAlphaBossBattle();
         }
-        */
+        
 
     }
 
@@ -139,10 +141,13 @@ public class StoryManager {
         pressEnterToContinue();
 
         System.out.println("\nBoss battle begins...");
+        
         // Alpha Boss Battle
-        //condition if madaug sa alpha boss
-         /*
-        if () {
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createGekuma());
+
+        fight.begin();
+
+        if (fight.getOutcome()) {
             System.out.println("\nAltair falls to one knee...");
             System.out.println();
             System.out.println("Altair (breathing heavily): You... you lack bond with your beasts,");
@@ -223,9 +228,11 @@ public class StoryManager {
         pressEnterToContinue();
 
         // Ace Trainer Battle
-        //condition if madaug sa ace jazz
-        /*
-        if () {
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createPirrot());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             System.out.println("\nAce Jazz: You've surpassed us all. Take this Challenge Ticket,");
             System.out.println("you've earned it. With it, you're worthy of the Tournament Trial.");
             System.out.println();
@@ -234,7 +241,7 @@ public class StoryManager {
             System.out.println("You may now attempt the Tournament Trial!");
             pressEnterToContinue();
         }
-        */
+        
 
     }
 
@@ -263,9 +270,11 @@ public class StoryManager {
         pressEnterToContinue();
 
         // Tournament Trial Battle
-        //condition if madaug sa trialmaster
-        /*
-        if () {
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createVoltchu());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
             System.out.println("And I suppose I'll answer some of your questions.");
             System.out.println();
@@ -290,7 +299,7 @@ public class StoryManager {
             pressEnterToContinue();
         }
 
-         */
+         
     }
 
     public void playStage3Collapse() {
@@ -348,13 +357,14 @@ public class StoryManager {
         System.out.println("╚════════════════════════════════════════╝");
 
         // Final Glitch Battle
-        //condition if madaug sa final boss
-        /*
-        if () {
+       Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createWoltrix());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             playEnding();
         }
 
-         */
     }
 
     private void playEnding() {
