@@ -32,6 +32,14 @@ public class MechaBeast {
         }
     }
 
+    // setter & getter for currentHp (since no Skill class yet)
+    public void setCurrentHp(int hp) {
+        this.currentHp = hp;
+    }
+    public int getCurrentHp() {
+        return currentHp;
+    }
+
     public String getName() {
         return name;
     }
@@ -152,6 +160,8 @@ enum ElementType {
             case STEEL:
                 if (defenderType == DARK || defenderType == ELECTRIC) return 2.0;
                 if (defenderType == FIRE || defenderType == EARTH) return 0.5;
+                break;
+            default:
                 break;
         }
 
