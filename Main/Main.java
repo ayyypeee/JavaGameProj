@@ -162,15 +162,13 @@ public class Main {
             if (choice == 9) {
                 System.out.println("\n⚠️ SECRET UNLOCKED! ⚠️");
                 System.out.println("✓ Kingmantis (OVERPOWERED CHARACTER) added to your team!");
-                System.out.println("  HP: " + selectedBeast.getMaxHp() +
-                        " | Speed: " + selectedBeast.getSpeed() +
+                System.out.println("  HP: " + selectedBeast.getMaxHp() + " | Speed: " + selectedBeast.getSpeed() +
                         " | Mana: " + selectedBeast.getMaxMana());
                 System.out.println("  This is a CHEAT beast with incredible stats!");
             } else {
                 System.out.println("✓ " + selectedBeast.getName() + " (" +
                         selectedBeast.getType().getDisplayName() + ") added to your team!");
-                System.out.println("  HP: " + selectedBeast.getMaxHp() +
-                        " | Speed: " + selectedBeast.getSpeed() +
+                System.out.println("  HP: " + selectedBeast.getMaxHp() + " | Speed: " + selectedBeast.getSpeed() +
                         " | Mana: " + selectedBeast.getMaxMana());
             }
 
@@ -184,8 +182,7 @@ public class Main {
         System.out.println("\nYour team:");
         for (int i = 0; i < player.getMechaBeasts().size(); i++) {
             MechaBeast beast = player.getMechaBeasts().get(i);
-            System.out.printf("%d. %s (%s)%n", (i + 1), beast.getName(),
-                    beast.getType().getDisplayName());
+            System.out.printf("%d. %s (%s)%n", (i + 1), beast.getName(), beast.getType().getDisplayName());
         }
 
         System.out.println("\nProfessor Ai-P: Excellent choices! Now let's begin the test!");
@@ -201,7 +198,7 @@ public class Main {
         // Stage 3: The Collapse
         storyManager.playStage3Collapse();
 
-        // Game Complete - Display Statistics
+        // Game Complete Display Statistics
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║          FINAL STATISTICS              ║");
         System.out.println("╚════════════════════════════════════════╝");
@@ -210,13 +207,13 @@ public class Main {
         System.out.println("\nYour Final Team:");
         for (int i = 0; i < player.getMechaBeasts().size(); i++) {
             MechaBeast beast = player.getMechaBeasts().get(i);
-            String status = beast.isAlive() ? "✓ ALIVE" : "✗ FAINTED";
-            System.out.printf("%d. %-15s (%s) - %s%n",
-                    (i + 1),
-                    beast.getName(),
-                    beast.getType().getDisplayName(),
-                    status
-            );
+            String status;
+            if (beast.isAlive()) {
+                status = "✓ ALIVE";
+            } else {
+                status = "✗ FAINTED";
+            }
+            System.out.printf("%d. %-15s (%s) - %s%n", (i + 1), beast.getName(), beast.getType().getDisplayName(), status);
         }
 
         System.out.println("\n╔════════════════════════════════════════╗");
@@ -228,6 +225,5 @@ public class Main {
         System.out.println("\nThank you for testing DigiWorld!");
         System.out.println("Your feedback will help shape the future of gaming!");
 
-        scanner.close();
     }
 }
