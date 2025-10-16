@@ -1,9 +1,7 @@
 package Main;
-import java.util.ArrayList;
-import java.util.List;
+
 public class MechaBeastFactory {
 
-    // Starter Beasts (Game.Player can choose from these)
     public static MechaBeast createKyoflare() {
         MechaBeast beast = new MechaBeast("Kyoflare", ElementType.FIRE, "Kyoryuger",
                 820, 105, 300, 25);
@@ -75,7 +73,8 @@ public class MechaBeastFactory {
         beast.addSkill(new Skill("Phantom Slash", ElementType.DARK, 90, 100, 80, 2));
         return beast;
     }
-    //op mecha beast
+
+    // OP mecha beast
     public static MechaBeast createKingmantis() {
         MechaBeast beast = new MechaBeast("Kingmantis", ElementType.STEEL, "KingOhger",
                 1200, 110, 400, 50);
@@ -86,7 +85,6 @@ public class MechaBeastFactory {
     }
 
     // Boss Beasts
-
     public static MechaBeast createWisdrake() {
         MechaBeast beast = new MechaBeast("Wisdrake", ElementType.PSYCHIC, "Timeranger",
                 860, 98, 360, 35);
@@ -105,17 +103,18 @@ public class MechaBeastFactory {
         return beast;
     }
 
-    public static List<MechaBeast> getAllStarterBeasts() {
-        List<MechaBeast> starters = new ArrayList<>();
-        starters.add(createKyoflare());
-        starters.add(createNokami());
-        starters.add(createVineratops());
-        starters.add(createVoltchu());
-        starters.add(createZyuugor());
-        starters.add(createPirrot());
-        starters.add(createGekuma());
-        starters.add(createShadefox());
-        starters.add(createKingmantis()); // Option 9: Secret/cheat beast
+    // Returns array of all beasts
+    public static MechaBeast[] getAllStarterBeasts() {
+        MechaBeast[] starters = new MechaBeast[9];
+        starters[0] = createKyoflare();
+        starters[1] = createNokami();
+        starters[2] = createVineratops();
+        starters[3] = createVoltchu();
+        starters[4] = createZyuugor();
+        starters[5] = createPirrot();
+        starters[6] = createGekuma();
+        starters[7] = createShadefox();
+        starters[8] = createKingmantis();
         return starters;
     }
 }

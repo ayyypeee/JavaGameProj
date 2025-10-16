@@ -1,70 +1,121 @@
 package Main;
 
-import java.util.ArrayList;
-import java.util.List;
+// BattleEntity is the SUPERCLASS, MechaBeast is the SUBCLASS
+public class MechaBeast extends BattleEntity {
+    private ElementType type;
+    private String henshin;
+    private int maxMana;
+    private int currentMana;
+    private int manaRegen;
+    private Skill[] skills;
+    private int[] skillCooldowns;
+    private int skillCount;
 
-public class MechaBeast {
-    private final String name;
-    private final ElementType type;
-    private final String henshin;
-    private final int maxHp;
-    private int currentHp;
-    private final int speed;
-    private final int maxMana;
-    private final int manaRegen;
-    private final List<Skill> skills;
 
     public MechaBeast(String name, ElementType type, String henshin, int hp, int speed, int mana, int manaRegen) {
-        this.name = name;
+
+        super(name, hp, speed);
         this.type = type;
         this.henshin = henshin;
-        this.maxHp = hp;
-        this.currentHp = hp;
-        this.speed = speed;
         this.maxMana = mana;
+        this.currentMana = mana;
         this.manaRegen = manaRegen;
-        this.skills = new ArrayList<>();
+        this.skills = new Skill[3];
+        this.skillCooldowns = new int[3];
+        this.skillCount = 0;
     }
 
     public void addSkill(Skill skill) {
-        if (skills.size() < 3) {
-            skills.add(skill);
+        //EXCEPTION HANDLING
+        try {
+            if (skillCount < 3) {
+                skills[skillCount] = skill;
+                skillCount++;
+            }
+        } catch (Exception e) {
+            System.out.println("Error adding skill: " + e.getMessage());
         }
-    }
-
-    public String getName() {
-        return name;
     }
 
     public ElementType getType() {
         return type;
     }
 
-
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-
-    public int getSpeed() {
-        return speed;
+    public String getHenshin() {
+        return henshin;
     }
 
     public int getMaxMana() {
         return maxMana;
     }
 
-    public boolean isAlive() {
-        return currentHp > 0;
+    public int getCurrentMana() {
+        return currentMana;
     }
 
+    public Skill[] getSkills() {
+        return skills;
+    }
 
+    public boolean canUseSkill(int skillIndex) {
+        //EXCEPTION HANDLING
+        // e check if skill index is valid, enough mana, and not on cooldown
+        try {
+            if (skillIndex < 0 || skillIndex >= skillCount)
+                return false;
+            Skill skill = skills[skillIndex];
+            return currentMana >= skill.manaCost() && skillCooldowns[skillIndex] == 0;
+        } catch (Exception e) {
+            System.out.println("Error checking skill: " + e.getMessage());
+            return false;
+        }
+    }
+    //Uses skill, reduces mana and sets cooldown
+    public void useSkill(int skillIndex) {
+        if (skillIndex >= 0 && skillIndex < skillCount) {
+            Skill skill = skills[skillIndex];
+            currentMana -= skill.manaCost();
+            skillCooldowns[skillIndex] = skill.cooldown();
+        }
+    }
 
+    //Regenerates mana
+    public void regenerateMana() {
+        currentMana += manaRegen;
+        if (currentMana > maxMana) currentMana = maxMana;
+    }
 
+    //Reduces cooldowns
+    public void reduceCooldowns() {
+        for (int i = 0; i < skillCooldowns.length; i++) {
+            if (skillCooldowns[i] > 0) {
+                skillCooldowns[i]--;
+            }
+        }
+    }
+    // Returns the cooldown of a specific skill
+    public int getSkillCooldown(int skillIndex) {
+        if (skillIndex >= 0 && skillIndex < skillCooldowns.length) {
+            return skillCooldowns[skillIndex];
+        }
+        return 0;
+    }
 
+    //ge overrides ang fullHeal para ma restore mana and reset skills cooldowns
+    @Override
+    public void fullHeal() {
+        super.fullHeal();
+        currentMana = maxMana;
+        for (int i = 0; i < skillCooldowns.length; i++) {
+            skillCooldowns[i] = 0;
+        }
+    }
+
+    // Creates copy of MechaBeast
     public MechaBeast copy() {
         MechaBeast copy = new MechaBeast(name, type, henshin, maxHp, speed, maxMana, manaRegen);
-        for (Skill skill : skills) {
+        for (int i = 0; i < skillCount; i++) {
+            Skill skill = skills[i];
             copy.addSkill(new Skill(skill.name(), skill.type(),
                     skill.minPower(), skill.maxPower(),
                     skill.manaCost(), skill.cooldown()));
@@ -72,109 +123,13 @@ public class MechaBeast {
         return copy;
     }
 
-}
+    // Displays status bar with HP and Mana
+    @Override
+    public String getStatusBar() {
+        int hpPercent = (currentHp * 100) / maxHp;
+        int manaPercent = (currentMana * 100) / maxMana;
 
-enum ElementType {
-    NEUTRAL("Neutral"),
-    FIRE("Fire"),
-    WATER("Water"),
-    GRASS("Grass"),
-    ELECTRIC("Electric"),
-    EARTH("Earth"),
-    WIND("Wind"),
-    FIGHTING("Fighting"),
-    PSYCHIC("Psychic"),
-    DARK("Dark"),
-    STEEL("Steel");
-
-    private final String displayName;
-
-    ElementType(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-    //para sa battle system
-    //strength ug weakness
-    public double getEffectivenessAgainst(ElementType defenderType) {
-        if (this == NEUTRAL || defenderType == NEUTRAL) {
-            return 1.0;
-        }
-
-        switch (this) {
-            case FIRE:
-                if (defenderType == GRASS || defenderType == WIND || defenderType == STEEL) return 2.0;
-                if (defenderType == WATER || defenderType == EARTH) return 0.5;
-                break;
-
-            case WATER:
-                if (defenderType == FIRE || defenderType == EARTH) return 2.0;
-                if (defenderType == GRASS || defenderType == ELECTRIC) return 0.5;
-                break;
-
-            case GRASS:
-                if (defenderType == WATER || defenderType == EARTH) return 2.0;
-                if (defenderType == FIRE || defenderType == WIND) return 0.5;
-                break;
-
-            case ELECTRIC:
-                if (defenderType == WATER || defenderType == WIND) return 2.0;
-                if (defenderType == EARTH || defenderType == STEEL) return 0.5;
-                break;
-
-            case EARTH:
-                if (defenderType == ELECTRIC || defenderType == STEEL || defenderType == FIRE) return 2.0;
-                if (defenderType == WATER || defenderType == GRASS || defenderType == DARK) return 0.5;
-                break;
-
-            case WIND:
-                if (defenderType == GRASS || defenderType == FIGHTING) return 2.0;
-                if (defenderType == FIRE || defenderType == ELECTRIC) return 0.5;
-                break;
-
-            case FIGHTING:
-                if (defenderType == DARK || defenderType == STEEL) return 2.0;
-                if (defenderType == WIND || defenderType == PSYCHIC) return 0.5;
-                break;
-
-            case PSYCHIC:
-                if (defenderType == FIGHTING) return 2.0;
-                if (defenderType == DARK || defenderType == STEEL) return 0.5;
-                break;
-
-            case DARK:
-                if (defenderType == EARTH || defenderType == WIND) return 2.0;
-                if (defenderType == FIGHTING || defenderType == STEEL) return 0.5;
-                break;
-
-            case STEEL:
-                if (defenderType == DARK || defenderType == ELECTRIC) return 2.0;
-                if (defenderType == FIRE || defenderType == EARTH) return 0.5;
-                break;
-        }
-
-        return 1.0;
-    }
-    //message for effectiveness
-    public String getEffectivenessMessage(ElementType defenderType) {
-        double effectiveness = getEffectivenessAgainst(defenderType);
-
-        if (effectiveness == 2.0) {
-            return "It's SUPER EFFECTIVE! 💥";
-        } else if (effectiveness == 0.5) {
-            return "It's not very effective... 💨";
-        } else {
-            return "";
-        }
+        return String.format("%s | HP: %d/%d (%d%%) | Mana: %d/%d (%d%%)",
+                name, currentHp, maxHp, hpPercent, currentMana, maxMana, manaPercent);
     }
 }
-    //weakness
-
-        //Skill system
-    //Stats management (HP, Speed, Mana)
-    //Beast.Beast selection
-
-
-
