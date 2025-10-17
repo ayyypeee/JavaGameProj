@@ -101,17 +101,18 @@ public class StoryManager {
         System.out.println("Sound effect: BRR BRRR BRRR DIDIDIDI!");
         System.out.println("You encountered a Mecha Beast!");
 
-        MechaBeast enemy = MechaBeastFactory.createVineratops();
-        Combat battle = new Combat(player, enemy, true);
-        boolean tutorialWon = battle.begin();
 
-        if (tutorialWon) {
-            System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
-            System.out.println("You may now continue.");
-            System.out.println(player.getName() + " (catching breath): That... felt too real.");
+        Combat battle = new Combat(player, MechaBeastFactory.createVineratops(), true);
+        
+        battle.setTutorialMode();
 
-            playAlphaBossBattle();
-        }
+        
+        System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
+        System.out.println("You may now continue.");
+        System.out.println(player.getName() + " (catching breath): That... felt too real.");
+
+        playAlphaBossBattle();
+        
     }
 
     private void playAlphaBossBattle() {
@@ -132,8 +133,8 @@ public class StoryManager {
         pressEnterToContinue();
 
         System.out.println("\nBoss battle begins...");
-        MechaBeast gekuma = MechaBeastFactory.createGekuma();
-        Combat battle = new Combat(player, gekuma, false);
+  
+        Combat battle = new Combat(player, MechaBeastFactory.createGekuma(), false);
         boolean alphaBossWon = battle.begin();
 
         if (alphaBossWon) {
@@ -213,6 +214,7 @@ public class StoryManager {
         System.out.println("for only the strongest may pass! HENSHIN!");
         System.out.println("⚡ Announcer: GOOOOKAAAIIIGGGEERRRR! ⚡");
         pressEnterToContinue();
+        
 
         Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false);
         if (battle.begin()) {
@@ -250,6 +252,7 @@ public class StoryManager {
         System.out.println("🕐 Announcer: TIIMMEERRAANGGEERR! 🕐");
         pressEnterToContinue();
 
+    
         Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false);
         if (battle.begin()) {
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
