@@ -44,6 +44,10 @@ public class Combat {
                     return true; // if enemy fainted
                 }
             }
+            
+            // reduce cooldowns after both turns
+            player.getCurrentBeast().reduceCooldowns();
+            enemy.reduceCooldowns();
             round++;
         }
         return player.hasAliveBeast(); // if loop ends, return player's surviving status
