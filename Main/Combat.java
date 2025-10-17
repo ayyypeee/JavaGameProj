@@ -4,19 +4,20 @@ import java.util.Scanner;
 public class Combat {
     Scanner scanner = new Scanner(System.in);
     // initialize participants
-    //I think Player player ni pag call para ma access tanan mechaBeasts kay if MechaBeast ra ni kay isa ra kabuok ma access
-    private MechaBeast player;
-    private MechaBeast enemy;
-    private boolean playerWon;
-    //nag add rako ani paras tutorial
+    Player player;
+    Player enemy;
+    private boolean playerWon = false;
     private boolean isTutorial;
-    //remove lng ning random kay sa skills ra nko ge butang adto ra e call
-    private Random rand = new Random();
 
-    public Combat(MechaBeast player, MechaBeast enemy, boolean isTutorial) {
+
+    public Combat(Player player, Player enemy, boolean isTutorial) {
         this.player = player;
         this.enemy = enemy;
         this.isTutorial = isTutorial;
+    }
+
+    public void setOutcome(boolean playerWon) {
+        this.playerWon = playerWon;
     }
 
     public boolean getOutcome() {
@@ -24,8 +25,7 @@ public class Combat {
     }
 
     //Battle mechanics
-    //e boolean lng ni para mo return ra dayon siyag true or false di na need mag butang ug getOutcome
-    public void begin() {
+    public boolean begin() {
         System.out.println("\n  ╔════════════════════════════════════════╗");
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
@@ -43,7 +43,7 @@ public class Combat {
             }
         }
 
-        checkOutcome();
+        return getOutcome();
     }
 
     //Damage calculations
@@ -136,9 +136,9 @@ public class Combat {
     //Victory/defeat conditions
     private void checkOutcome() {
         if (player.isAlive()) {
-            playerWon = true;
+            setOutcome(true);
         } else {
-            playerWon = false;
+            setOutcome(false);
         }
     }
     //ui ra
