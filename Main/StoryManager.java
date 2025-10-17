@@ -1,15 +1,20 @@
-package Main;
+
+package Main;// Game.StoryManager.java
 
 import java.util.Scanner;
 
 public class StoryManager {
-   Scanner scanner = new Scanner(System.in);
-    private Player player;
+    private final Scanner scanner;
+
+    private final Player player;
 
     public StoryManager(Player player) {
+        this.scanner = new Scanner(System.in);
+
         this.player = player;
     }
-    //Intro
+
+
     public void playIntroduction() {
         System.out.println("╔════════════════════════════════════════╗");
         System.out.println("║       WELCOME TO DIGIWORLD RPG         ║");
@@ -50,7 +55,6 @@ public class StoryManager {
         pressEnterToContinue();
     }
 
-    // Stage 1
     public void playStage1AlphaVillage() {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║      STAGE 1: THE ALPHA VILLAGE        ║");
@@ -75,6 +79,7 @@ public class StoryManager {
         System.out.println("Ugh, fine. No turning back now.");
         pressEnterToContinue();
 
+        // Arrival at Alpha Village
         System.out.println("\n--- You arrive at Alpha Village ---");
         System.out.println();
         System.out.println(player.getName() + ": Hello? Anyone here?");
@@ -101,17 +106,21 @@ public class StoryManager {
         System.out.println("Sound effect: BRR BRRR BRRR DIDIDIDI!");
         System.out.println("You encountered a Mecha Beast!");
 
-        MechaBeast enemy = MechaBeastFactory.createVineratops();
-        Combat battle = new Combat(player, enemy, true);
-        boolean tutorialWon = battle.begin();
+      // Tutorial battle sequence
+        // Initialize player's MechaBeast to Kingmantis 
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createVineratops());
 
-        if (tutorialWon) {
+        fight.begin();
+
+        if (fight.getOutcome()) {
             System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
             System.out.println("You may now continue.");
             System.out.println(player.getName() + " (catching breath): That... felt too real.");
 
             playAlphaBossBattle();
         }
+        
+
     }
 
     private void playAlphaBossBattle() {
@@ -132,11 +141,13 @@ public class StoryManager {
         pressEnterToContinue();
 
         System.out.println("\nBoss battle begins...");
-        MechaBeast gekuma = MechaBeastFactory.createGekuma();
-        Combat battle = new Combat(player, gekuma, false);
-        boolean alphaBossWon = battle.begin();
+        
+        // Alpha Boss Battle
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createGekuma());
 
-        if (alphaBossWon) {
+        fight.begin();
+
+        if (fight.getOutcome()) {
             System.out.println("\nAltair falls to one knee...");
             System.out.println();
             System.out.println("Altair (breathing heavily): You... you lack bond with your beasts,");
@@ -157,6 +168,8 @@ public class StoryManager {
 
             playStage1Ending();
         }
+
+          
     }
 
     private void playStage1Ending() {
@@ -175,7 +188,6 @@ public class StoryManager {
         System.out.println(player.getName() + " (gritting teeth): Tch...");
         pressEnterToContinue();
     }
-    // Stage 2
 
     public void playStage2BetaCity() {
         System.out.println("\n╔════════════════════════════════════════╗");
@@ -205,6 +217,7 @@ public class StoryManager {
     }
 
     private void playAceTrainerBattle() {
+        // Only Ace Jazz Battle
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║     ACE TRAINER JAZZ CHALLENGE         ║");
         System.out.println("╚════════════════════════════════════════╝");
@@ -214,8 +227,12 @@ public class StoryManager {
         System.out.println("⚡ Announcer: GOOOOKAAAIIIGGGEERRRR! ⚡");
         pressEnterToContinue();
 
-        Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false);
-        if (battle.begin()) {
+        // Ace Trainer Battle
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createPirrot());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             System.out.println("\nAce Jazz: You've surpassed us all. Take this Challenge Ticket,");
             System.out.println("you've earned it. With it, you're worthy of the Tournament Trial.");
             System.out.println();
@@ -224,6 +241,8 @@ public class StoryManager {
             System.out.println("You may now attempt the Tournament Trial!");
             pressEnterToContinue();
         }
+        
+
     }
 
     private void playTournamentTrial() {
@@ -247,11 +266,15 @@ public class StoryManager {
         System.out.println();
         System.out.println("Trialmaster: Enough talk! Prove your strength first,");
         System.out.println("then I'll answer. HENSHIN!");
-        System.out.println("🕐 Announcer: TIIMMEERRAANGGEERR! 🕐");
+        System.out.println("🕐 Announcer: SHHIINNNKKKEEENNNGGGERRR! 🕐");
         pressEnterToContinue();
 
-        Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false);
-        if (battle.begin()) {
+        // Tournament Trial Battle
+        Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createVoltchu());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
             System.out.println("And I suppose I'll answer some of your questions.");
             System.out.println();
@@ -275,9 +298,10 @@ public class StoryManager {
             System.out.println("you are now registered in the tournament!");
             pressEnterToContinue();
         }
+
+         
     }
 
-    // Stage 3
     public void playStage3Collapse() {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║   STAGE 3: THE COLLAPSE OF BETA CITY   ║");
@@ -327,16 +351,20 @@ public class StoryManager {
         playFinalBoss();
     }
 
-    // Final boss battle
     private void playFinalBoss() {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║          FINAL BOSS BATTLE             ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false);
-        if (battle.begin()) {
+        // Final Glitch Battle
+       Combat fight = new Combat(MechaBeastFactory.createKingmantis(), MechaBeastFactory.createWoltrix());
+
+        fight.begin();
+        
+        if (fight.getOutcome()) {
             playEnding();
         }
+
     }
 
     private void playEnding() {
@@ -369,3 +397,4 @@ public class StoryManager {
         scanner.nextLine();
     }
 }
+
