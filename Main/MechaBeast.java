@@ -25,6 +25,19 @@ public class MechaBeast extends BattleEntity {
         this.skillCount = 0;
     }
 
+    public void setCurrentHp(int hp) {
+        this.currentHp = hp;
+        if(currentHp < 0) {
+            this.currentHp = 0;
+        } else if (currentHp > maxHp) {
+            this.currentHp = maxHp;
+        }
+    }
+    
+    public int getCurrentHp() {
+        return currentHp;
+    }
+
     public void addSkill(Skill skill) {
         //EXCEPTION HANDLING
         try {

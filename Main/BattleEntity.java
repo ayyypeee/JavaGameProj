@@ -16,22 +16,18 @@ public abstract class BattleEntity implements Damageable {
     }
 
     public String getName() {
-
         return name;
     }
 
     public int getMaxHp() {
-
         return maxHp;
     }
 
     public int getCurrentHp() {
-
         return currentHp;
     }
 
     public int getSpeed() {
-
         return speed;
     }
 
@@ -43,13 +39,11 @@ public abstract class BattleEntity implements Damageable {
 
     @Override
     public boolean isAlive() {
-
         return currentHp > 0;
     }
 
     @Override
     public void fullHeal() {
-
         currentHp = maxHp;
     }
 
