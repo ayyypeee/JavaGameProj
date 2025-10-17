@@ -4,20 +4,15 @@ import java.util.Scanner;
 public class Combat {
     Scanner scanner = new Scanner(System.in);
     // initialize participants
-    Player player;
-    Player enemy;
-    private boolean playerWon = false;
+    private Player player;
+    private Player enemy;
+    private boolean playerWon;
     private boolean isTutorial;
 
-
-    public Combat(Player player, Player enemy, boolean isTutorial) {
+    public Combat(MechaBeast player, MechaBeast enemy, boolean isTutorial) {
         this.player = player;
         this.enemy = enemy;
         this.isTutorial = isTutorial;
-    }
-
-    public void setOutcome(boolean playerWon) {
-        this.playerWon = playerWon;
     }
 
     public boolean getOutcome() {
@@ -25,7 +20,8 @@ public class Combat {
     }
 
     //Battle mechanics
-    public boolean begin() {
+    //e boolean lng ni para mo return ra dayon siyag true or false di na need mag butang ug getOutcome
+    public void begin() {
         System.out.println("\n  ╔════════════════════════════════════════╗");
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
@@ -43,7 +39,7 @@ public class Combat {
             }
         }
 
-        return getOutcome();
+        checkOutcome();
     }
 
     //Damage calculations
@@ -60,7 +56,8 @@ public class Combat {
     //Battle UIs
     // e boolean lng ni para e check ug kinsay mo una base sa speed
     // Mao nang interface sa battle pilion lng ang action
-    /*    private boolean playerTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
+    
+    private boolean playerTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
         System.out.println("\n━━━ YOUR TURN ━━━");
         System.out.println("Choose your action:");
         System.out.println("1-3: Use Skill");
@@ -72,13 +69,8 @@ public class Combat {
          System.out.print("\nYour choice: ");
         int action = getIntInput(6);
 
-     */
-    private void playerTurn() {
-
-        System.out.println("\nYOUR BEAST!");
         takeDamage(enemy, calculateDamage(player, enemy));
 
-    }
     /* ga suway rakog make ug ai sa enemy nga ang skill nga isog ang gamiton pero wa pa ni nko na testingan nag suwaysuway rako HAHAHHA
     private void enemyTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
         System.out.println("\n━━━ ENEMY TURN ━━━");
@@ -136,9 +128,9 @@ public class Combat {
     //Victory/defeat conditions
     private void checkOutcome() {
         if (player.isAlive()) {
-            setOutcome(true);
+            playerWon = true;
         } else {
-            setOutcome(false);
+            playerWon = false;
         }
     }
     //ui ra
