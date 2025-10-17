@@ -104,6 +104,7 @@ public class StoryManager {
 
         Combat battle = new Combat(player, MechaBeastFactory.createVineratops(), true);
         
+        // wla nay boolean condition ani kay mo loop back ang tutorial until mo win ang player
         battle.setTutorialMode();
 
         
