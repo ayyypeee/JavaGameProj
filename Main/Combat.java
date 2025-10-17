@@ -9,7 +9,7 @@ public class Combat {
     private boolean playerWon;
     private boolean isTutorial;
 
-    public Combat(MechaBeast player, MechaBeast enemy, boolean isTutorial) {
+    public Combat(Player player, Player enemy, boolean isTutorial) {
         this.player = player;
         this.enemy = enemy;
         this.isTutorial = isTutorial;
@@ -27,15 +27,32 @@ public class Combat {
         System.out.println("╚════════════════════════════════════════╝");
 
         int round = 1;
-        while (player.isAlive() && enemy.isAlive()) {
+        MechaBeast playerBeast = player.getCurrentBeast();
+        MechaBeast enemyBeast = enemy.getCurrentBeast();
+
+        while (player.hasAliveBeast() && enemy.hasAliveBeast()) {
             System.out.println("\n=== ROUND " + round++ + "! ===");
-            playerTurn();
-            if (!enemy.isAlive()) {
-                break;
+            displayBattleStatus(playerBeast, enemyBeast);
+
+            // Player's turn
+            playerTurn(playerBeast, enemyBeast);
+            if (!enemyBeast.isAlive()) {
+                switchBeast(enemy); // switches beast if fainted
+                enemyBeast = enemy.getCurrentBeast(); // update to next beast
+
+                if (enemyBeast == null) { // no more beasts left
+                    break;
+                }
             }
-            enemyTurn();
-            if (!player.isAlive()) {
-                break;
+
+            // Enemy's turn
+            enemyTurn(enemyBeast, playerBeast);
+            if (!playerBeast.isAlive()) {
+                switchBeast(player); 
+                playerBeast = player.getCurrentBeast(); 
+                if (playerBeast == null) { 
+                    break;
+                }
             }
         }
 
