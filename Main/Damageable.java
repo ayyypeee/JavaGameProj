@@ -7,4 +7,7 @@ public interface Damageable {
     void takeDamage(int damage);
     boolean isAlive();
     void fullHeal();
+    void reduceMana(int amount);
+    void regainMana(int amount);
+    boolean hasEnoughMana(int amount);
 }

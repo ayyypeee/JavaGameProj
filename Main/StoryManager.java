@@ -139,8 +139,6 @@ public class StoryManager {
         boolean alphaBossWon = battle.begin();
 
         if (alphaBossWon) {
-            player.getCurrentBeast().fullHeal();
-
             System.out.println("\nAltair falls to one knee...");
             System.out.println();
             System.out.println("Altair (breathing heavily): You... you lack bond with your beasts,");
@@ -221,8 +219,6 @@ public class StoryManager {
 
         Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false);
         if (battle.begin()) {
-            player.getCurrentBeast().fullHeal();
-
             System.out.println("\nAce Jazz: You've surpassed us all. Take this Challenge Ticket,");
             System.out.println("you've earned it. With it, you're worthy of the Tournament Trial.");
             System.out.println();
@@ -260,8 +256,6 @@ public class StoryManager {
     
         Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false);
         if (battle.begin()) {
-            player.getCurrentBeast().fullHeal();
-
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
             System.out.println("And I suppose I'll answer some of your questions.");
             System.out.println();
@@ -345,7 +339,6 @@ public class StoryManager {
 
         Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false);
         if (battle.begin()) {
-            player.getCurrentBeast().fullHeal();
             playEnding();
         }
     }

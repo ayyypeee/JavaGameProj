@@ -24,6 +24,9 @@ public class Combat {
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
 
+        player.getCurrentBeast().fullHeal();
+        enemy.fullHeal();
+
        int round = 1;
        boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
 
@@ -45,9 +48,14 @@ public class Combat {
                 }
             }
             
-            // reduce cooldowns after both turns
+            // Skill cooldown reduction after both turns
             player.getCurrentBeast().reduceCooldowns();
             enemy.reduceCooldowns();
+
+            // mana regen
+            player.getCurrentBeast().regenerateMana();
+            enemy.regenerateMana();
+
             round++;
         }
         return player.hasAliveBeast(); // if loop ends, return player's surviving status
@@ -191,9 +199,13 @@ public class Combat {
                 return true;
             }
 
+            enemyBeast.reduceMana(skill.manaCost());
+
         } else {
             System.out.println(enemyBeast.getName() + " is recovering...");
         }
+
+        
         return false;
     }
 
@@ -283,37 +295,57 @@ public class Combat {
         }
     }
 
-    //Skill cooldown and mana management
 
     // Display skills for player
     private void displaySkills(MechaBeast beast) {
         System.out.println("\n|| Available skills for " + beast.getName() + " ||");
         Skill[] skills = beast.getSkills();
+        
         for (int i = 0; i < skills.length; i++) {
             Skill skill = skills[i];
 
+            if(skill == null) {
+                System.out.println((i + 1) + ": ---");
+                continue;
+            }
+
+            // get mana & cooldown info
+            int cd = beast.getSkillCooldown(i);
+            boolean onCooldown = cd > 0;
+            boolean hasMana = beast.getMana() >= skill.manaCost();
+            boolean canUse = hasMana && !onCooldown;
+
+
             // display cooldown info
             String cooldownInfo = "";
-            if (skill != null) {
-                int cd = beast.getSkillCooldown(i);
-
-                if(cd > 0) {
-                    cooldownInfo = " (Cooldown: " + cd + " more turns)";
-                }
             
+            if(onCooldown) {
+                cooldownInfo = " (Cooldown: " + cd + " more turns)";
+            }
 
-            // displays skill availability
-            boolean canUse = beast.canUseSkill(i);
-            String canUsetext = "";
-            if(!canUse) {
-                canUsetext = " [UNAVAILABLE]";
+           // mana display
+           String manaInfo = " | Mana: " + skill.manaCost();
+
+           //skill availability display
+           String status = "";
+
+           if(!canUse) {
+            if(onCooldown) {
+                status = "[COOLDOWN]";
+            } else if (!hasMana) {
+                status = " [INSUFFICIENT MANA]";
             }
-            // display all skills
-            System.out.printf("%d: %s%s%s%n", (i + 1), skill.getDescription(), cooldownInfo, canUsetext);
-        } else {
-            System.out.println((i + 1) + ": ---");
-            }
-        }
+           }
+
+           // final output
+           System.out.printf("%d: %s (%s) | Power: %d-%d%s%s %s%n",
+                    (i + 1), skill.name(), skill.type().getDisplayName(),
+                    skill.minPower(), skill.maxPower(),
+                    manaInfo, cooldownInfo, status);
+        }         
+
+            
+        
     }
 
     // TUTORIAL MODE METHODS
