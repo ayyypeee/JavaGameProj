@@ -158,6 +158,10 @@ public class StoryManager {
             pressEnterToContinue();
 
             playStage1Ending();
+        } else {
+            gameOver();
+            alphaBossWon = false;
+            playAlphaBossBattle();
         }
     }
 
@@ -226,6 +230,9 @@ public class StoryManager {
             System.out.println("You've obtained the Challenge Ticket!");
             System.out.println("You may now attempt the Tournament Trial!");
             pressEnterToContinue();
+        } else {
+            gameOver();
+            playStage2BetaCity();
         }
     }
 
@@ -278,6 +285,9 @@ public class StoryManager {
             System.out.println("Announcer: Congratulations challenger " + player.getName() + ",");
             System.out.println("you are now registered in the tournament!");
             pressEnterToContinue();
+        } else {
+            gameOver();
+            playTournamentTrial();
         }
     }
 
@@ -340,6 +350,9 @@ public class StoryManager {
         Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false);
         if (battle.begin()) {
             playEnding();
+        } else {
+            gameOver();
+            playGlitchEncounter();
         }
     }
 
@@ -371,5 +384,19 @@ public class StoryManager {
     private void pressEnterToContinue() {
         System.out.println("\n[Press ENTER to continue]");
         scanner.nextLine();
+    }
+
+
+    private void gameOver() {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║              GAME OVER                 ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.println("\nTry again?");
+
+        System.out.println("Press ENTER to restart.");
+        scanner.nextLine();
+
+        System.out.println("\nRESTARTING...");
+        System.out.println("\n=========================================");
     }
 }

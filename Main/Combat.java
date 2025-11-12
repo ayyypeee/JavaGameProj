@@ -20,11 +20,11 @@ public class Combat {
 
     //Battle mechanics
     public boolean begin() {
-        System.out.println("\n  ╔════════════════════════════════════════╗");
+        System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        player.getCurrentBeast().fullHeal();
+        player.healAllBeasts();
         enemy.fullHeal();
 
        int round = 1;
@@ -117,39 +117,56 @@ public class Combat {
 
             case 4:
                 System.out.println("\n╔══ SWITCHING BEAST ══╗");
-                System.out.println("Choose a beast to switch to:");
                 MechaBeast[] beasts = player.getMechaBeasts();
                 
+
                 // showcase available beasts
-                for(int i = 0; i < player.getBeastCount(); i++) {
-                    if(beasts[i].isAlive() && beasts[i] != playerBeast) {
-                        System.out.printf("%d: %s (HP: %d/%d)%n", (i + 1), beasts[i].getName(),
-                                beasts[i].getCurrentHp(), beasts[i].getMaxHp());
-                    }
+                    System.out.println(" Choose a beast to switch to:");
 
-                int choice = getIntInput(beasts.length);
-                MechaBeast chosenBeast = beasts[choice - 1];
+                    for(int i = 0; i < player.getBeastCount(); i++) {
+                        MechaBeast b = beasts[i];
+                        
+                        // if no beasts in slot
+                        if(b == null) {
+                            System.out.printf("%d: --- %n", (i + 1));
+                            continue;
+                        }
 
-                if(chosenBeast == playerBeast) {
-                    System.out.println(" " + chosenBeast.getName() + " is already in battle!");
-                } else if (!chosenBeast.isAlive()) {
-                    System.out.println(" " + chosenBeast.getName() + " has fainted and cannot battle!");
-                } else {
-                    player.setCurrentBeastIndex(choice - 1);
-                    System.out.println(" You switched to " + chosenBeast.getName() + "!");
-                }
+                        String status = "";
+                        if(b == playerBeast) {
+                            status = " [CURRENT]";
+                        } else if (!b.isAlive()) {
+                            status = " [FAINTED]";
+                        }
 
+                        System.out.printf("%d: %s%s (HP: %d/%d)%n", (i + 1), beasts[i].getName(), status, beasts[i].getCurrentHp(), beasts[i].getMaxHp());
+
+                        }
+
+                        int choice = getIntInput(player.getBeastCount());
+                        MechaBeast chosenBeast = beasts[choice - 1];
+
+                        if(chosenBeast == playerBeast) {
+                            System.out.println(" " + chosenBeast.getName() + " is already in battle!");
+                        } else if (!chosenBeast.isAlive()) {
+                            System.out.println(" " + chosenBeast.getName() + " has fainted and cannot battle!");
+                        } else {
+                            player.setCurrentBeastIndex(choice - 1);
+                            System.out.println(" You switched to " + chosenBeast.getName() + "!");
+                        }
+                    
                 break;
-            }
-
+            
             case 5:
                 displayEnemyInfo(enemyBeast);
                 return playerTurn(playerBeast, enemyBeast); // go back to turn
 
+
             case 6:
                 displayTypeChart();
-                return playerTurn(playerBeast, enemyBeast); 
+                return playerTurn(playerBeast, enemyBeast);
         }
+
         return false;
     }
 
@@ -365,7 +382,7 @@ public class Combat {
 
     // Resets combat until player wins
     private void resetCombat() {
-        player.getCurrentBeast().fullHeal();
+        player.healAllBeasts();
         enemy.fullHeal();
     }
 }
