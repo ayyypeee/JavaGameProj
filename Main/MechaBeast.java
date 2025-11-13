@@ -4,8 +4,6 @@ package Main;
 public class MechaBeast extends BattleEntity {
     private ElementType type;
     private String henshin;
-    private int maxMana;
-    private int currentMana;
     private int manaRegen;
     private Skill[] skills;
     private int[] skillCooldowns;
@@ -14,15 +12,28 @@ public class MechaBeast extends BattleEntity {
 
     public MechaBeast(String name, ElementType type, String henshin, int hp, int speed, int mana, int manaRegen) {
 
-        super(name, hp, speed);
+        super(name, hp, speed, manaRegen);
         this.type = type;
         this.henshin = henshin;
         this.maxMana = mana;
-        this.currentMana = mana;
+        this.mana = mana;
         this.manaRegen = manaRegen;
         this.skills = new Skill[3];
         this.skillCooldowns = new int[3];
         this.skillCount = 0;
+    }
+
+    public void setCurrentHp(int hp) {
+        this.currentHp = hp;
+        if(currentHp < 0) {
+            this.currentHp = 0;
+        } else if (currentHp > maxHp) {
+            this.currentHp = maxHp;
+        }
+    }
+    
+    public int getCurrentHp() {
+        return currentHp;
     }
 
     public void addSkill(Skill skill) {
@@ -45,13 +56,6 @@ public class MechaBeast extends BattleEntity {
         return henshin;
     }
 
-    public int getMaxMana() {
-        return maxMana;
-    }
-
-    public int getCurrentMana() {
-        return currentMana;
-    }
 
     public Skill[] getSkills() {
         return skills;
@@ -64,7 +68,7 @@ public class MechaBeast extends BattleEntity {
             if (skillIndex < 0 || skillIndex >= skillCount)
                 return false;
             Skill skill = skills[skillIndex];
-            return currentMana >= skill.manaCost() && skillCooldowns[skillIndex] == 0;
+            return mana >= skill.manaCost() && skillCooldowns[skillIndex] == 0;
         } catch (Exception e) {
             System.out.println("Error checking skill: " + e.getMessage());
             return false;
@@ -74,15 +78,17 @@ public class MechaBeast extends BattleEntity {
     public void useSkill(int skillIndex) {
         if (skillIndex >= 0 && skillIndex < skillCount) {
             Skill skill = skills[skillIndex];
-            currentMana -= skill.manaCost();
+            mana -= skill.manaCost();
             skillCooldowns[skillIndex] = skill.cooldown();
         }
     }
 
     //Regenerates mana
     public void regenerateMana() {
-        currentMana += manaRegen;
-        if (currentMana > maxMana) currentMana = maxMana;
+        mana += manaRegen;
+        if (mana > maxMana) {
+            mana = maxMana;
+        }
     }
 
     //Reduces cooldowns
@@ -94,18 +100,18 @@ public class MechaBeast extends BattleEntity {
         }
     }
     // Returns the cooldown of a specific skill
-    public int getSkillCooldown(int skillIndex) {
-        if (skillIndex >= 0 && skillIndex < skillCooldowns.length) {
+        public int getSkillCooldown(int skillIndex) {
+            Skill[] skills = getSkills();
+            if (skills == null || skillIndex < 0 || skillIndex >= skills.length || skills[skillIndex] == null) {
+                return 0;
+            }
             return skillCooldowns[skillIndex];
         }
-        return 0;
-    }
 
     //ge overrides ang fullHeal para ma restore mana and reset skills cooldowns
     @Override
     public void fullHeal() {
         super.fullHeal();
-        currentMana = maxMana;
         for (int i = 0; i < skillCooldowns.length; i++) {
             skillCooldowns[i] = 0;
         }
@@ -127,9 +133,9 @@ public class MechaBeast extends BattleEntity {
     @Override
     public String getStatusBar() {
         int hpPercent = (currentHp * 100) / maxHp;
-        int manaPercent = (currentMana * 100) / maxMana;
+        int manaPercent = (mana * 100) / maxMana;
 
         return String.format("%s | HP: %d/%d (%d%%) | Mana: %d/%d (%d%%)",
-                name, currentHp, maxHp, hpPercent, currentMana, maxMana, manaPercent);
+                name, currentHp, maxHp, hpPercent, mana, maxMana, manaPercent);
     }
 }

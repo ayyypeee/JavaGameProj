@@ -101,17 +101,19 @@ public class StoryManager {
         System.out.println("Sound effect: BRR BRRR BRRR DIDIDIDI!");
         System.out.println("You encountered a Mecha Beast!");
 
-        MechaBeast enemy = MechaBeastFactory.createVineratops();
-        Combat battle = new Combat(player, enemy, true);
-        boolean tutorialWon = battle.begin();
 
-        if (tutorialWon) {
-            System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
-            System.out.println("You may now continue.");
-            System.out.println(player.getName() + " (catching breath): That... felt too real.");
+        Combat battle = new Combat(player, MechaBeastFactory.createVineratops(), true);
+        
+        // wla nay boolean condition ani kay mo loop back ang tutorial until mo win ang player
+        battle.setTutorialMode();
 
-            playAlphaBossBattle();
-        }
+        
+        System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
+        System.out.println("You may now continue.");
+        System.out.println(player.getName() + " (catching breath): That... felt too real.");
+
+        playAlphaBossBattle();
+        
     }
 
     private void playAlphaBossBattle() {
@@ -132,8 +134,8 @@ public class StoryManager {
         pressEnterToContinue();
 
         System.out.println("\nBoss battle begins...");
-        MechaBeast gekuma = MechaBeastFactory.createGekuma();
-        Combat battle = new Combat(player, gekuma, false);
+  
+        Combat battle = new Combat(player, MechaBeastFactory.createGekuma(), false);
         boolean alphaBossWon = battle.begin();
 
         if (alphaBossWon) {
@@ -156,6 +158,10 @@ public class StoryManager {
             pressEnterToContinue();
 
             playStage1Ending();
+        } else {
+            gameOver();
+            alphaBossWon = false;
+            playAlphaBossBattle();
         }
     }
 
@@ -213,6 +219,7 @@ public class StoryManager {
         System.out.println("for only the strongest may pass! HENSHIN!");
         System.out.println("⚡ Announcer: GOOOOKAAAIIIGGGEERRRR! ⚡");
         pressEnterToContinue();
+        
 
         Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false);
         if (battle.begin()) {
@@ -223,6 +230,9 @@ public class StoryManager {
             System.out.println("You've obtained the Challenge Ticket!");
             System.out.println("You may now attempt the Tournament Trial!");
             pressEnterToContinue();
+        } else {
+            gameOver();
+            playStage2BetaCity();
         }
     }
 
@@ -250,6 +260,7 @@ public class StoryManager {
         System.out.println("🕐 Announcer: TIIMMEERRAANGGEERR! 🕐");
         pressEnterToContinue();
 
+    
         Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false);
         if (battle.begin()) {
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
@@ -274,6 +285,9 @@ public class StoryManager {
             System.out.println("Announcer: Congratulations challenger " + player.getName() + ",");
             System.out.println("you are now registered in the tournament!");
             pressEnterToContinue();
+        } else {
+            gameOver();
+            playTournamentTrial();
         }
     }
 
@@ -336,6 +350,9 @@ public class StoryManager {
         Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false);
         if (battle.begin()) {
             playEnding();
+        } else {
+            gameOver();
+            playGlitchEncounter();
         }
     }
 
@@ -367,5 +384,19 @@ public class StoryManager {
     private void pressEnterToContinue() {
         System.out.println("\n[Press ENTER to continue]");
         scanner.nextLine();
+    }
+
+
+    private void gameOver() {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║              GAME OVER                 ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.println("\nTry again?");
+
+        System.out.println("Press ENTER to restart.");
+        scanner.nextLine();
+
+        System.out.println("\nRESTARTING...");
+        System.out.println("\n=========================================");
     }
 }

@@ -47,6 +47,7 @@ public class Skill {
         return cooldown;
     }
 
+
     // random damage
     public int calculateDamage() {
         if (maxPower <= minPower)
@@ -58,4 +59,5 @@ public class Skill {
         return String.format("%s (%s) | Power: %d-%d | Mana: %d | CD: %d",
                 name, type.getDisplayName(), minPower, maxPower, manaCost, cooldown);
     }
+
 }
