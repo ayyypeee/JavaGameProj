@@ -1,9 +1,9 @@
-package Main;
+ package Main;
 
 import java.util.Scanner;
 
 public class StoryManager {
-   Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
     private Player player;
 
     public StoryManager(Player player) {
@@ -102,18 +102,18 @@ public class StoryManager {
         System.out.println("You encountered a Mecha Beast!");
 
 
-        Combat battle = new Combat(player, MechaBeastFactory.createVineratops(), true);
-        
+        Combat battle = new Combat(player, MechaBeastFactory.createVineratops(), true, "Stage 1: Alpha Village (Tutorial)");
+
         // wla nay boolean condition ani kay mo loop back ang tutorial until mo win ang player
         battle.setTutorialMode();
 
-        
+
         System.out.println("\nAnnouncer: You have successfully completed the tutorial.");
         System.out.println("You may now continue.");
         System.out.println(player.getName() + " (catching breath): That... felt too real.");
 
         playAlphaBossBattle();
-        
+
     }
 
     private void playAlphaBossBattle() {
@@ -134,8 +134,8 @@ public class StoryManager {
         pressEnterToContinue();
 
         System.out.println("\nBoss battle begins...");
-  
-        Combat battle = new Combat(player, MechaBeastFactory.createGekuma(), false);
+
+        Combat battle = new Combat(player, MechaBeastFactory.createGekuma(), false, "Stage 1: Alpha Boss");
         boolean alphaBossWon = battle.begin();
 
         if (alphaBossWon) {
@@ -219,9 +219,9 @@ public class StoryManager {
         System.out.println("for only the strongest may pass! HENSHIN!");
         System.out.println("⚡ Announcer: GOOOOKAAAIIIGGGEERRRR! ⚡");
         pressEnterToContinue();
-        
 
-        Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false);
+
+        Combat battle = new Combat(player, MechaBeastFactory.createPirrot(), false, "Stage 2: Beta City - Ace Trainer");
         if (battle.begin()) {
             System.out.println("\nAce Jazz: You've surpassed us all. Take this Challenge Ticket,");
             System.out.println("you've earned it. With it, you're worthy of the Tournament Trial.");
@@ -260,8 +260,8 @@ public class StoryManager {
         System.out.println("🕐 Announcer: TIIMMEERRAANGGEERR! 🕐");
         pressEnterToContinue();
 
-    
-        Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false);
+
+        Combat battle = new Combat(player, MechaBeastFactory.createWisdrake(), false, "Stage 2: Tournament Trial");
         if (battle.begin()) {
             System.out.println("\nTrialmaster: You have beaten me. You are qualified for the tournament!");
             System.out.println("And I suppose I'll answer some of your questions.");
@@ -347,7 +347,7 @@ public class StoryManager {
         System.out.println("║          FINAL BOSS BATTLE             ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false);
+        Combat battle = new Combat(player, MechaBeastFactory.createWoltrix(), false, "Stage 3: Final Boss");
         if (battle.begin()) {
             playEnding();
         } else {

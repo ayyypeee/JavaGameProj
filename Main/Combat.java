@@ -3,19 +3,53 @@ import java.util.Scanner;
 public class Combat {
     Scanner scanner = new Scanner(System.in);
     // initialize participants
-    private Player player;
-    private MechaBeast enemy;
+    private final Player player;
+    private final MechaBeast enemy;
     private boolean playerWon;
     private boolean isTutorial = false;
+    private final String stageName;
 
-    public Combat(Player player, MechaBeast enemy, boolean isTutorial) {
+    public Combat(Player player, MechaBeast enemy, boolean isTutorial, String stageName) {
         this.player = player;
-        this.enemy = enemy;
         this.isTutorial = isTutorial;
+        this.stageName = stageName != null ? stageName : "";
+        this.enemy = prepareEnemy(enemy);
     }
 
     public boolean getOutcome() {
         return playerWon;
+    }
+
+    // Created a nerfed copy for tutorial
+    private MechaBeast prepareEnemy(MechaBeast original) {
+        try {
+            if (!isTutorial) {
+                return original.copy();
+            }
+
+            int nerfedHp = Math.max(1, original.getMaxHp() / 3);
+            int nerfedSpeed = Math.max(1, original.getSpeed() - 20);
+            int nerfedMana = Math.max(1, original.getMaxMana() / 2);
+            int nerfedManaRegen = Math.max(1, 5);
+
+            MechaBeast nerfed = new MechaBeast(original.getName(), original.getType(), original.getHenshin(),
+                    nerfedHp, nerfedSpeed, nerfedMana, nerfedManaRegen);
+
+            Skill[] skills = original.getSkills();
+            if (skills != null) {
+                for (Skill skill : skills) {
+                    if (skill == null) continue;
+                    int minP = Math.max(1, (int) Math.round(skill.minPower() * 0.5));
+                    int maxP = Math.max(minP, (int) Math.round(skill.maxPower() * 0.5));
+                    int manaCost = Math.max(0, skill.manaCost() / 2);
+                    nerfed.addSkill(new Skill(skill.name(), skill.type(), minP, maxP, manaCost, skill.cooldown()));
+                }
+            }
+            return nerfed;
+        } catch (Exception e) {
+            System.out.println("Error preparing enemy: " + e.getMessage());
+            return original.copy();
+        }
     }
 
     //Battle mechanics
@@ -24,14 +58,15 @@ public class Combat {
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        player.healAllBeasts();
-        enemy.fullHeal();
+        if (player != null) player.healAllBeasts();
+        if (enemy != null) enemy.fullHeal();
 
-       int round = 1;
-       boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
+        int round = 1;
+        boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
 
         while (player.hasAliveBeast() && enemy.getCurrentHp() > 0) {
-            System.out.println("\n=== ROUND " + round + "! ===");
+
+            System.out.println("\n=== " + (stageName.isEmpty() ? "" : (stageName + " - ")) + "ROUND " + round + " ===");
             displayBattleStatus(player.getCurrentBeast(), enemy);
 
             if(playerFirst) {
@@ -47,7 +82,7 @@ public class Combat {
                     return true; // if enemy fainted
                 }
             }
-            
+
             // Skill cooldown reduction after both turns
             player.getCurrentBeast().reduceCooldowns();
             enemy.reduceCooldowns();
@@ -61,9 +96,7 @@ public class Combat {
         return player.hasAliveBeast(); // if loop ends, return player's surviving status
     }
 
-
-
-    //Battle UIs    
+    //Battle UIs
     private boolean playerTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
         System.out.println("\n━━━ YOUR TURN ━━━");
         System.out.println("Choose your action:");
@@ -73,7 +106,7 @@ public class Combat {
         System.out.println("6: View Type Chart");
 
         displaySkills(playerBeast);
-         System.out.print("\nYour choice: ");
+        System.out.print("\nYour choice: ");
         int action = getIntInput(6);
 
         switch(action) {
@@ -118,45 +151,45 @@ public class Combat {
             case 4:
                 System.out.println("\n╔══ SWITCHING BEAST ══╗");
                 MechaBeast[] beasts = player.getMechaBeasts();
-                
+
 
                 // showcase available beasts
-                    System.out.println(" Choose a beast to switch to:");
+                System.out.println(" Choose a beast to switch to:");
 
-                    for(int i = 0; i < player.getBeastCount(); i++) {
-                        MechaBeast b = beasts[i];
-                        
-                        // if no beasts in slot
-                        if(b == null) {
-                            System.out.printf("%d: --- %n", (i + 1));
-                            continue;
-                        }
+                for(int i = 0; i < player.getBeastCount(); i++) {
+                    MechaBeast b = beasts[i];
 
-                        String status = "";
-                        if(b == playerBeast) {
-                            status = " [CURRENT]";
-                        } else if (!b.isAlive()) {
-                            status = " [FAINTED]";
-                        }
+                    // if no beasts in slot
+                    if(b == null) {
+                        System.out.printf("%d: --- %n", (i + 1));
+                        continue;
+                    }
 
-                        System.out.printf("%d: %s%s (HP: %d/%d)%n", (i + 1), beasts[i].getName(), status, beasts[i].getCurrentHp(), beasts[i].getMaxHp());
+                    String status = "";
+                    if(b == playerBeast) {
+                        status = " [CURRENT]";
+                    } else if (!b.isAlive()) {
+                        status = " [FAINTED]";
+                    }
 
-                        }
+                    System.out.printf("%d: %s%s (HP: %d/%d)%n", (i + 1), beasts[i].getName(), status, beasts[i].getCurrentHp(), beasts[i].getMaxHp());
 
-                        int choice = getIntInput(player.getBeastCount());
-                        MechaBeast chosenBeast = beasts[choice - 1];
+                }
 
-                        if(chosenBeast == playerBeast) {
-                            System.out.println(" " + chosenBeast.getName() + " is already in battle!");
-                        } else if (!chosenBeast.isAlive()) {
-                            System.out.println(" " + chosenBeast.getName() + " has fainted and cannot battle!");
-                        } else {
-                            player.setCurrentBeastIndex(choice - 1);
-                            System.out.println(" You switched to " + chosenBeast.getName() + "!");
-                        }
-                    
+                int choice = getIntInput(player.getBeastCount());
+                MechaBeast chosenBeast = beasts[choice - 1];
+
+                if(chosenBeast == playerBeast) {
+                    System.out.println(" " + chosenBeast.getName() + " is already in battle!");
+                } else if (!chosenBeast.isAlive()) {
+                    System.out.println(" " + chosenBeast.getName() + " has fainted and cannot battle!");
+                } else {
+                    player.setCurrentBeastIndex(choice - 1);
+                    System.out.println(" You switched to " + chosenBeast.getName() + "!");
+                }
+
                 break;
-            
+
             case 5:
                 displayEnemyInfo(enemyBeast);
                 return playerTurn(playerBeast, enemyBeast); // go back to turn
@@ -171,7 +204,7 @@ public class Combat {
     }
 
     /* ga suway rakog make ug ai sa enemy nga ang skill nga isog ang gamiton pero wa pa ni nko na testingan nag suwaysuway rako HAHAHHA
-    */
+     */
 
     // Enemy AI turn
     private boolean enemyTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
@@ -222,7 +255,7 @@ public class Combat {
             System.out.println(enemyBeast.getName() + " is recovering...");
         }
 
-        
+
         return false;
     }
 
@@ -317,7 +350,7 @@ public class Combat {
     private void displaySkills(MechaBeast beast) {
         System.out.println("\n|| Available skills for " + beast.getName() + " ||");
         Skill[] skills = beast.getSkills();
-        
+
         for (int i = 0; i < skills.length; i++) {
             Skill skill = skills[i];
 
@@ -326,7 +359,7 @@ public class Combat {
                 continue;
             }
 
-            // get mana & cooldown info
+            // get mana and cooldown info
             int cd = beast.getSkillCooldown(i);
             boolean onCooldown = cd > 0;
             boolean hasMana = beast.getMana() >= skill.manaCost();
@@ -335,34 +368,34 @@ public class Combat {
 
             // display cooldown info
             String cooldownInfo = "";
-            
+
             if(onCooldown) {
                 cooldownInfo = " (Cooldown: " + cd + " more turns)";
             }
 
-           // mana display
-           String manaInfo = " | Mana: " + skill.manaCost();
+            // mana display
+            String manaInfo = " | Mana: " + skill.manaCost();
 
-           //skill availability display
-           String status = "";
+            //skill availability display
+            String status = "";
 
-           if(!canUse) {
-            if(onCooldown) {
-                status = "[COOLDOWN]";
-            } else if (!hasMana) {
-                status = " [INSUFFICIENT MANA]";
+            if(!canUse) {
+                if(onCooldown) {
+                    status = "[COOLDOWN]";
+                } else if (!hasMana) {
+                    status = " [INSUFFICIENT MANA]";
+                }
             }
-           }
 
-           // final output
-           System.out.printf("%d: %s (%s) | Power: %d-%d%s%s %s%n",
+            // final output
+            System.out.printf("%d: %s (%s) | Power: %d-%d%s%s %s%n",
                     (i + 1), skill.name(), skill.type().getDisplayName(),
                     skill.minPower(), skill.maxPower(),
                     manaInfo, cooldownInfo, status);
-        }         
+        }
 
-            
-        
+
+
     }
 
     // TUTORIAL MODE METHODS

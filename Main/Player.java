@@ -36,6 +36,7 @@ public class Player {
 
     public int getBeastCount() {
         return beastCount;
+        
     }
     // e return and current active beast
     public MechaBeast getCurrentBeast() {

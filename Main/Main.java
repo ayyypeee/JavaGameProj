@@ -49,7 +49,7 @@ public class Main {
         System.out.println("├────┼─────────────┼──────────┼──────┼───────┼───────┤");
 
         // Loop sa mga available beasts
-             for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) {
             MechaBeast beast = availableBeasts[i];
             System.out.printf("│ %-2d │ %-11s │ %-8s │ %-4d │ %-5d │ %-5d │%n",
                     (i + 1),
