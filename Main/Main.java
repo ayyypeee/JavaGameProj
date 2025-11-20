@@ -49,7 +49,7 @@ public class Main {
         System.out.println("├────┼─────────────┼──────────┼──────┼───────┼───────┤");
 
         // Loop sa mga available beasts
-        for (int i = 0; i < 8; i++) {
+             for (int i = 0; i < 8; i++) {
             MechaBeast beast = availableBeasts[i];
             System.out.printf("│ %-2d │ %-11s │ %-8s │ %-4d │ %-5d │ %-5d │%n",
                     (i + 1),
@@ -68,27 +68,39 @@ public class Main {
         System.out.println("   High HP = Tank | High Speed = First Strike | High Mana = Powerful Skills");
         System.out.println("   ⚠️ Option 9 is a hidden beast... try it if you dare!");
 
-        // Select 3 Beasts using loop
+        // Select 3 Beasts
+        boolean[] alreadyChosen = new boolean[9];
         int selection;
         for (selection = 1; selection <= 3; selection++) {
             System.out.println("\n╔══ SELECTION " + selection + "/3 ══╗");
-            System.out.print("Choose Mecha Beast " + selection + " (1-9): ");
-
-            // EXCEPTION HANDLING
             int choice = -1;
-            while (choice < 1 || choice > 9) {
+
+            while (true) {
+                System.out.print("Choose Mecha Beast " + selection + " (1-9): ");
                 try {
                     choice = scanner.nextInt();
+
+                    scanner.nextLine();
+
                     if (choice < 1 || choice > 9) {
-                        System.out.print("Please enter a number between 1 and 9: ");
+                        throw new IllegalArgumentException("Please enter a number between 1 and 9.");
                     }
+
+                    if (alreadyChosen[choice - 1]) {
+                        throw new IllegalStateException("That beast is already chosen. Pick another.");
+                    }
+
+
+                    alreadyChosen[choice - 1] = true;
+                    break;
+
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    System.out.println(e.getMessage());
                 } catch (Exception e) {
                     System.out.print("Invalid input. Please enter a number: ");
                     scanner.nextLine();
                 }
             }
-
-
 
             MechaBeast selectedBeast = availableBeasts[choice - 1];
 
@@ -107,7 +119,7 @@ public class Main {
                         " | Mana: " + selectedBeast.getMaxMana());
             }
 
-            //Adding beast to player
+            //Adding beast to player team
             player.addMechaBeast(selectedBeast.copy());
         }
 
