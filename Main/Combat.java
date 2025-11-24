@@ -85,8 +85,9 @@ public class Combat {
         scanner.nextLine();
 
 
-        int round = 1;
-        boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
+       int round = 1;
+       boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
+
 
         while (player.hasAliveBeast() && enemy.getCurrentHp() > 0) {
 
