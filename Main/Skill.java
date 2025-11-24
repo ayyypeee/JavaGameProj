@@ -27,7 +27,7 @@ public class Skill {
         return name;
     }
 
-    public ElementType type() {
+    public ElementType type()  {
         return type;
     }
 
