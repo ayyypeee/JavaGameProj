@@ -61,8 +61,33 @@ public class Combat {
         if (player != null) player.healAllBeasts();
         if (enemy != null) enemy.fullHeal();
 
-        int round = 1;
-        boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
+        // Let the player choose which beast starts the battle
+        MechaBeast[] beasts = player.getMechaBeasts();
+        int maxBeasts = player.getBeastCount();
+        if (maxBeasts > 1) {
+            System.out.println("\n╔══ CHOOSE YOUR BEAST ══╗");
+            for (int i = 0; i < maxBeasts; i++) {
+                MechaBeast b = beasts[i];
+                if (b == null) {
+                    System.out.printf("%d: ---\n", i + 1);
+                    continue;
+                }
+                String flag = b.isAlive() ? "" : " (FAINTED)";
+                System.out.printf("%d: %s%s (HP: %d/%d | Speed: %d | Mana: %d)%n",
+                        (i + 1), b.getName(), flag, b.getCurrentHp(), b.getMaxHp(), b.getSpeed(), b.getMaxMana());
+            }
+            System.out.print("\nYour choice: ");
+            int startChoice = getIntInput(maxBeasts);
+            player.setCurrentBeastIndex(startChoice - 1);
+        }
+
+        System.out.println("\nYou sent out " + player.getCurrentBeast().getName() + "!");
+        scanner.nextLine();
+
+
+       int round = 1;
+       boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
+
 
         while (player.hasAliveBeast() && enemy.getCurrentHp() > 0) {
 
