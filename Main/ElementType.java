@@ -1,5 +1,5 @@
 package Main;
-//wla rako ga enum ge lahi nlng nakog method ni
+
 public class ElementType {
     private final String displayName;
 
@@ -69,7 +69,7 @@ public class ElementType {
             return 1.0;
         }
     }
-    //Ipakita ra sa combat kung unsa ka effective ang attack
+
     public String getEffectivenessMessage(ElementType defenderType) {
         double effectiveness = getEffectivenessAgainst(defenderType);
 

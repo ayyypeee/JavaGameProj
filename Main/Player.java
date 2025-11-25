@@ -1,25 +1,26 @@
 package Main;
 
 public class Player {
-
-    private String name;
-    private MechaBeast[] mechaBeasts;
-    private int beastCount;
-    private int currentBeastIndex;
+    private String name;                    // Player's name
+    private MechaBeast[] mechaBeasts;       // Array to hold up to 3 beasts
+    private int beastCount;                 // How many beasts the player currently has
+    private int currentBeastIndex;          // Which beast is currently in battle
 
     public Player(String name) {
         this.name = name;
-        this.mechaBeasts = new MechaBeast[3];
-        this.beastCount = 0;
-        this.currentBeastIndex = 0;
+        this.mechaBeasts = new MechaBeast[3];  // Maximum 3 beasts per player
+        this.beastCount = 0;                   // Start with no beasts
+        this.currentBeastIndex = 0;            // Start at first position
     }
 
     public void addMechaBeast(MechaBeast beast) {
-        //Prevent overflow
         try {
+            // Check if there's room for another beast
             if (beastCount < 3) {
                 mechaBeasts[beastCount] = beast;
                 beastCount++;
+            } else {
+                System.out.println("Error: Cannot add more than 3 beasts!");
             }
         } catch (Exception e) {
             System.out.println("Error adding beast: " + e.getMessage());
@@ -36,47 +37,38 @@ public class Player {
 
     public int getBeastCount() {
         return beastCount;
-        
     }
-    // e return and current active beast
+
     public MechaBeast getCurrentBeast() {
-        if (beastCount == 0)
+        // return null if player has no beasts
+        if (beastCount == 0) {
             return null;
+        }
         return mechaBeasts[currentBeastIndex];
     }
-    // e set ang current active beast by index
+
     public void setCurrentBeastIndex(int index) {
+        // Validate the index is within valid range
         if (index >= 0 && index < beastCount) {
             this.currentBeastIndex = index;
+        } else {
+            System.out.println("Error: Invalid beast index!");
         }
     }
-    //then get current active beast index
-    public int getCurrentBeastIndex() {
-        return currentBeastIndex;
-    }
-    //e check ra if naa pay buhi nga beast
+
     public boolean hasAliveBeast() {
         for (int i = 0; i < beastCount; i++) {
             if (mechaBeasts[i].isAlive()) {
-                return true;
+                return true;  // Found at least one alive beast
             }
         }
-        return false;
+        return false;  // No alive beasts found
     }
-    // Heals all beasts to full health
+
     public void healAllBeasts() {
         for (int i = 0; i < beastCount; i++) {
             mechaBeasts[i].fullHeal();
         }
     }
 
-    // Counts alive beasts
-    public int getAliveCount() {
-        int count = 0;
-        for (int i = 0; i < beastCount; i++) {
-            if (mechaBeasts[i].isAlive())
-                count++;
-        }
-        return count;
-    }
 }

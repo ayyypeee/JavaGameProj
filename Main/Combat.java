@@ -1,59 +1,83 @@
 package Main;
 import java.util.Scanner;
+
 public class Combat {
-    Scanner scanner = new Scanner(System.in);
-    // initialize participants
-    private final Player player;
-    private final MechaBeast enemy;
-    private boolean playerWon;
-    private boolean isTutorial = false;
-    private final String stageName;
+    private Scanner scanner;
+    private Player player;
+    private MechaBeast enemy;
+    private boolean isTutorial;
+    private String stageName;
 
     public Combat(Player player, MechaBeast enemy, boolean isTutorial, String stageName) {
-        this.player = player;
+        this.scanner = new Scanner(System.in);
         this.isTutorial = isTutorial;
-        this.stageName = stageName != null ? stageName : "";
-        this.enemy = prepareEnemy(enemy);
+        this.player = player;
+
+        if (stageName != null) {
+            this.stageName = stageName;
+        } else {
+            this.stageName = "";
+        }
+
+        this.enemy = prepareEnemy(enemy);  // Prepare enemy (nerf if tutorial)
     }
 
-    public boolean getOutcome() {
-        return playerWon;
-    }
 
-    // Created a nerfed copy for tutorial
-    private MechaBeast prepareEnemy(MechaBeast original) {
+    private MechaBeast prepareEnemy(MechaBeast originalEnemy) {
         try {
+
             if (!isTutorial) {
-                return original.copy();
+                return originalEnemy.copy();
             }
 
-            int nerfedHp = Math.max(1, original.getMaxHp() / 3);
-            int nerfedSpeed = Math.max(1, original.getSpeed() - 20);
-            int nerfedMana = Math.max(1, original.getMaxMana() / 2);
-            int nerfedManaRegen = Math.max(1, 5);
+            // Divide stats by 3 to make it easier for beginners
+            int tutorialHp = Math.max(1, originalEnemy.getMaxHp() / 3);
+            int tutorialSpeed = Math.max(1, originalEnemy.getSpeed() - 20);
+            int tutorialMana = Math.max(1, originalEnemy.getMaxMana() / 3);
+            int tutorialManaRegen = 5;
 
-            MechaBeast nerfed = new MechaBeast(original.getName(), original.getType(), original.getHenshin(),
-                    nerfedHp, nerfedSpeed, nerfedMana, nerfedManaRegen);
+            // Create the nerfed beast with reduced stats
+            MechaBeast nerfedEnemy = new MechaBeast(
+                    originalEnemy.getName(),
+                    originalEnemy.getType(),
+                    originalEnemy.getHenshin(),
+                    tutorialHp,
+                    tutorialSpeed,
+                    tutorialMana,
+                    tutorialManaRegen
+            );
 
-            Skill[] skills = original.getSkills();
-            if (skills != null) {
-                for (Skill skill : skills) {
+            // Copy skills but make them weaker
+            Skill[] originalSkills = originalEnemy.getSkills();
+            if (originalSkills != null) {
+                for (Skill skill : originalSkills) {
                     if (skill == null) continue;
-                    int minP = Math.max(1, (int) Math.round(skill.minPower() * 0.5));
-                    int maxP = Math.max(minP, (int) Math.round(skill.maxPower() * 0.5));
-                    int manaCost = Math.max(0, skill.manaCost() / 2);
-                    nerfed.addSkill(new Skill(skill.name(), skill.type(), minP, maxP, manaCost, skill.cooldown()));
+
+                    // Reduce skill power for tutorial
+                    int weakMinPower = Math.max(1, (int) Math.round(skill.minPower() * 0.5));
+                    int weakMaxPower = Math.max(weakMinPower, (int) Math.round(skill.maxPower() * 0.5));
+                    int weakManaCost = Math.max(0, skill.manaCost() / 2);
+
+                    nerfedEnemy.addSkill(new Skill(
+                            skill.name(),
+                            skill.type(),
+                            weakMinPower,
+                            weakMaxPower,
+                            weakManaCost,
+                            skill.cooldown()
+                    ));
                 }
             }
-            return nerfed;
+            return nerfedEnemy;
+
         } catch (Exception e) {
             System.out.println("Error preparing enemy: " + e.getMessage());
-            return original.copy();
+            return originalEnemy.copy();
         }
     }
 
-    //Battle mechanics
     public boolean begin() {
+
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║              BATTLE START              ║");
         System.out.println("╚════════════════════════════════════════╝");
@@ -61,68 +85,100 @@ public class Combat {
         if (player != null) player.healAllBeasts();
         if (enemy != null) enemy.fullHeal();
 
-        // Let the player choose which beast starts the battle
-        MechaBeast[] beasts = player.getMechaBeasts();
-        int maxBeasts = player.getBeastCount();
-        if (maxBeasts > 1) {
-            System.out.println("\n╔══ CHOOSE YOUR BEAST ══╗");
-            for (int i = 0; i < maxBeasts; i++) {
-                MechaBeast b = beasts[i];
-                if (b == null) {
-                    System.out.printf("%d: ---\n", i + 1);
-                    continue;
-                }
-                String flag = b.isAlive() ? "" : " (FAINTED)";
-                System.out.printf("%d: %s%s (HP: %d/%d | Speed: %d | Mana: %d)%n",
-                        (i + 1), b.getName(), flag, b.getCurrentHp(), b.getMaxHp(), b.getSpeed(), b.getMaxMana());
-            }
-            System.out.print("\nYour choice: ");
-            int startChoice = getIntInput(maxBeasts);
-            player.setCurrentBeastIndex(startChoice - 1);
+        // Let player choose starting beast
+        assert player != null;
+        MechaBeast[] playerBeasts = player.getMechaBeasts();
+        int totalBeasts = player.getBeastCount();
+
+        if (totalBeasts > 1) {
+            showBeastSelectionMenu(playerBeasts, totalBeasts);
         }
 
         System.out.println("\nYou sent out " + player.getCurrentBeast().getName() + "!");
         scanner.nextLine();
 
-
-       int round = 1;
-       boolean playerFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
-
+        int turnNumber = 1;
+        boolean playerGoesFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
 
         while (player.hasAliveBeast() && enemy.getCurrentHp() > 0) {
 
-            System.out.println("\n=== " + (stageName.isEmpty() ? "" : (stageName + " - ")) + "ROUND " + round + " ===");
+            // Display current turn number and stage
+            String stage;
+            if (stageName.isEmpty()) {
+                stage = "";
+            } else {
+                stage = stageName + " - ";
+            }
+
+            System.out.println("\n═══ " + stage + "TURN " + turnNumber + " ═══");
+
             displayBattleStatus(player.getCurrentBeast(), enemy);
 
-            if(playerFirst) {
-                if(playerTurn(player.getCurrentBeast(), enemy)) {
-                    return true; // if enemy fainted, skip enemy turn
-                } else if (enemyTurn(player.getCurrentBeast(), enemy)) {
-                    return false; // if player fainted
+            // Determine turn order based on speed
+            if (playerGoesFirst) {
+
+                if (executePlayerTurn(player.getCurrentBeast(), enemy)) {
+                    return true;
+                }
+
+                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) {
+                    return false;
                 }
             } else {
-                if(enemyTurn(player.getCurrentBeast(), enemy)) {
-                    return false; // if player fainted, skip player turn
-                } else if (playerTurn(player.getCurrentBeast(), enemy)) {
-                    return true; // if enemy fainted
+
+                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) {
+                    return false;
+                }
+
+                if (executePlayerTurn(player.getCurrentBeast(), enemy)) {
+                    return true;
                 }
             }
 
-            // Skill cooldown reduction after both turns
             player.getCurrentBeast().reduceCooldowns();
             enemy.reduceCooldowns();
 
-            // mana regen
             player.getCurrentBeast().regenerateMana();
             enemy.regenerateMana();
 
-            round++;
+            turnNumber++;
         }
-        return player.hasAliveBeast(); // if loop ends, return player's surviving status
+
+        // Return true if player has alive beasts (player wins)
+        return player.hasAliveBeast();
     }
 
-    //Battle UIs
-    private boolean playerTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
+    private void showBeastSelectionMenu(MechaBeast[] beasts, int count) {
+        System.out.println("\n╔══ CHOOSE YOUR BEAST ══╗");
+
+        for (int i = 0; i < count; i++) {
+            MechaBeast beast = beasts[i];
+
+            if (beast == null) {
+                System.out.printf("%d: ---\n", i + 1);
+                continue;
+            }
+
+            String statusFlag = beast.isAlive() ? "" : " (FAINTED)";
+
+            System.out.printf("%d: %s (%s)%s (HP: %d/%d | Speed: %d | Mana: %d)%n",
+                    (i + 1),
+                    beast.getName(),
+                    beast.getType().getDisplayName(),
+                    statusFlag,
+                    beast.getCurrentHp(),
+                    beast.getMaxHp(),
+                    beast.getSpeed(),
+                    beast.getMaxMana()
+            );
+        }
+
+        System.out.print("\nYour choice: ");
+        int choice = getValidIntInput(count);
+        player.setCurrentBeastIndex(choice - 1);
+    }
+
+    private boolean executePlayerTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
         System.out.println("\n━━━ YOUR TURN ━━━");
         System.out.println("Choose your action:");
         System.out.println("1-3: Use Skill");
@@ -132,161 +188,216 @@ public class Combat {
 
         displaySkills(playerBeast);
         System.out.print("\nYour choice: ");
-        int action = getIntInput(6);
+        int action = getValidIntInput(6);
 
         switch(action) {
             case 1:
             case 2:
             case 3:
-                int skillIndex = action - 1;
-                if (playerBeast.canUseSkill(skillIndex)) {
-                    Skill skill = playerBeast.getSkills()[skillIndex];
-                    int baseDamage = skill.calculateDamage();
-
-                    // Calculate type effectiveness
-                    double effectiveness = skill.type().getEffectivenessAgainst(enemyBeast.getType());
-                    int finalDamage = (int) Math.round(baseDamage * effectiveness);
-
-                    System.out.println(" You used " + skill.name() + "!");
-
-                    // Show type advantage message
-                    String effectivenessMsg = skill.type().getEffectivenessMessage(enemyBeast.getType());
-                    if (!effectivenessMsg.isEmpty()) {
-                        System.out.println(" " + effectivenessMsg);
-                    }
-
-                    System.out.println(" Enemy took " + finalDamage + " damage!");
-                    if (effectiveness != 1.0) {
-                        System.out.println("   (Base: " + baseDamage + " × " + effectiveness + "x type bonus)");
-                    }
-
-                    enemyBeast.takeDamage(finalDamage);
-                    playerBeast.useSkill(skillIndex);
-
-                    // Check if enemy fainted
-                    if (!enemyBeast.isAlive()) {
-                        System.out.println(" Enemy " + enemyBeast.getName() + " has fainted!");
-                        return true;
-                    }
-                } else {
-                    System.out.println(" Skill is unavailable!");
-                }
-                break;
+                // Use a skill
+                return useSkill(playerBeast, enemyBeast, action - 1);
 
             case 4:
-                System.out.println("\n╔══ SWITCHING BEAST ══╗");
-                MechaBeast[] beasts = player.getMechaBeasts();
-
-
-                // showcase available beasts
-                System.out.println(" Choose a beast to switch to:");
-
-                for(int i = 0; i < player.getBeastCount(); i++) {
-                    MechaBeast b = beasts[i];
-
-                    // if no beasts in slot
-                    if(b == null) {
-                        System.out.printf("%d: --- %n", (i + 1));
-                        continue;
-                    }
-
-                    String status = "";
-                    if(b == playerBeast) {
-                        status = " [CURRENT]";
-                    } else if (!b.isAlive()) {
-                        status = " [FAINTED]";
-                    }
-
-                    System.out.printf("%d: %s%s (HP: %d/%d)%n", (i + 1), beasts[i].getName(), status, beasts[i].getCurrentHp(), beasts[i].getMaxHp());
-
-                }
-
-                int choice = getIntInput(player.getBeastCount());
-                MechaBeast chosenBeast = beasts[choice - 1];
-
-                if(chosenBeast == playerBeast) {
-                    System.out.println(" " + chosenBeast.getName() + " is already in battle!");
-                } else if (!chosenBeast.isAlive()) {
-                    System.out.println(" " + chosenBeast.getName() + " has fainted and cannot battle!");
-                } else {
-                    player.setCurrentBeastIndex(choice - 1);
-                    System.out.println(" You switched to " + chosenBeast.getName() + "!");
-                }
-
+                // Switch to different beast
+                switchBeast();
                 break;
 
             case 5:
+                // View enemy information
                 displayEnemyInfo(enemyBeast);
-                return playerTurn(playerBeast, enemyBeast); // go back to turn
-
+                return executePlayerTurn(playerBeast, enemyBeast);  // Re-do turn
 
             case 6:
+                // View type effectiveness chart
                 displayTypeChart();
-                return playerTurn(playerBeast, enemyBeast);
+                return executePlayerTurn(playerBeast, enemyBeast);  // Re-do turn
         }
 
         return false;
     }
 
-    /* ga suway rakog make ug ai sa enemy nga ang skill nga isog ang gamiton pero wa pa ni nko na testingan nag suwaysuway rako HAHAHHA
-     */
 
-    // Enemy AI turn
-    private boolean enemyTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
-        System.out.println("\n━━━ ENEMY TURN ━━━");
+    private boolean useSkill(MechaBeast attacker, MechaBeast defender, int skillIndex) {
+        // Check if the skill can be used
+        if (!attacker.canUseSkill(skillIndex)) {
+            System.out.println("\n❌ Skill is unavailable!");
+            return false;
+        }
 
-        // Simple AI ug unsa ang isog nga skill maoy gamiton
-        int skillToUse = -1;
-        for (int i = 2; i >= 0; i--) {
-            if (enemyBeast.canUseSkill(i)) {
-                skillToUse = i;
+        Skill selectedSkill = attacker.getSkills()[skillIndex];
+
+        // Calculate base damage (random between min and max power)
+        int baseDamage = selectedSkill.calculateDamage();
+
+        // Calculate type effectiveness (2x for super effective, 0.5x for not very effective)
+        double typeMultiplier = selectedSkill.type().getEffectivenessAgainst(defender.getType());
+
+        // Calculate final damage with type bonus
+        int finalDamage = (int) Math.round(baseDamage * typeMultiplier);
+
+        System.out.println("\n💥 You used " + selectedSkill.name() + "!");
+
+        //ype effectiveness message
+        String effectivenessMessage = selectedSkill.type().getEffectivenessMessage(defender.getType());
+        if (!effectivenessMessage.isEmpty()) {
+            System.out.println(effectivenessMessage);
+        }
+
+        // Apply damage to enemy
+        System.out.println("⚔️  Enemy took " + finalDamage + " damage!");
+
+        // Show damage calculation
+        if (typeMultiplier != 1.0) {
+            System.out.println("   (Base: " + baseDamage + " × " + typeMultiplier + "x type bonus)");
+        }
+
+        defender.takeDamage(finalDamage);
+        attacker.useSkill(skillIndex);
+
+        // Check if enemy is defeated
+        if (!defender.isAlive()) {
+            System.out.println("\n💀 Enemy " + defender.getName() + " has fainted!");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void switchBeast() {
+        System.out.println("\n╔══ SWITCHING BEAST ══╗");
+        MechaBeast[] beasts = player.getMechaBeasts();
+        MechaBeast currentBeast = player.getCurrentBeast();
+        int beastCount = player.getBeastCount();
+
+        // If player has no other alive beast, inform and return
+        boolean otherAliveExists = false;
+        for (int i = 0; i < beastCount; i++) {
+            MechaBeast b = beasts[i];
+            if (b != null && b.isAlive() && b != currentBeast) {
+                otherAliveExists = true;
                 break;
             }
         }
-
-        if (skillToUse != -1) {
-            Skill skill = enemyBeast.getSkills()[skillToUse];
-            int baseDamage = skill.calculateDamage();
-
-            // Calculate type effectiveness
-            double effectiveness = skill.type().getEffectivenessAgainst(playerBeast.getType());
-            int finalDamage = (int) Math.round(baseDamage * effectiveness);
-
-            System.out.println(" " + enemyBeast.getName() + " used " + skill.name() + "!");
-
-            // Show type advantage message
-            String effectivenessMsg = skill.type().getEffectivenessMessage(playerBeast.getType());
-            if (!effectivenessMsg.isEmpty()) {
-                System.out.println(" " + effectivenessMsg);
-            }
-
-            playerBeast.takeDamage(finalDamage);
-
-            System.out.println(" You took " + finalDamage + " damage!");
-            if (effectiveness != 1.0) {
-                System.out.println("   (Base: " + baseDamage + " × " + effectiveness + "x type bonus)");
-            }
-
-            enemyBeast.useSkill(skillToUse);
-
-            if(!playerBeast.isAlive()) {
-                System.out.println(" Your " + playerBeast.getName() + " has fainted!");
-                return true;
-            }
-
-            enemyBeast.reduceMana(skill.manaCost());
-
-        } else {
-            System.out.println(enemyBeast.getName() + " is recovering...");
+        if (!otherAliveExists) {
+            System.out.println("❗ No other available Mecha Beasts to switch to.");
+            return;
         }
 
+        while (true) {
+            System.out.println("Choose a beast to switch to:");
+
+            // Display all available beasts
+            for (int i = 0; i < beastCount; i++) {
+                MechaBeast beast = beasts[i];
+
+                if (beast == null) {
+                    System.out.printf("%d: ---%n", (i + 1));
+                    continue;
+                }
+
+                String status = "";
+                if (beast == currentBeast) {
+                    status = " [CURRENT]";
+                } else if (!beast.isAlive()) {
+                    status = " [FAINTED]";
+                }
+
+                System.out.printf("%d: %s (%s)%s (HP: %d/%d)%n",
+                        (i + 1),
+                        beast.getName(),
+                        beast.getType().getDisplayName(),
+                        status,
+                        beast.getCurrentHp(),
+                        beast.getMaxHp()
+                );
+            }
+
+            System.out.print("Your choice: ");
+            int choice = getValidIntInput(beastCount);
+
+            try {
+                MechaBeast chosenBeast = beasts[choice - 1];
+
+                if (chosenBeast == null) {
+                    System.out.println("❌ That slot is empty. Choose another beast.");
+                    continue;
+                }
+
+                if (!chosenBeast.isAlive()) {
+                    System.out.println("❌ " + chosenBeast.getName() + " has fainted and cannot battle! Choose another beast.");
+                    continue;
+                }
+
+                player.setCurrentBeastIndex(choice - 1);
+                System.out.println("✓ You switched to " + chosenBeast.getName() + "!");
+                break;
+
+            } catch (Exception e) {
+                System.out.println("Invalid selection. Please choose a valid beast.");
+            }
+        }
+    }
+
+    private boolean executeEnemyTurn(MechaBeast playerBeast, MechaBeast enemyBeast) {
+        System.out.println("\n━━━ ENEMY TURN ━━━");
+
+        // Simple AI: Try to use the strongest available skill
+        int skillToUse = -1;
+        for (int i = 2; i >= 0; i--) {
+            try {
+                if (enemyBeast.canUseSkill(i)) {
+                    skillToUse = i;
+                    break;
+                }
+            } catch (Exception ignored) { }
+        }
+
+        // If no usable skill found, fall back to index 0 if present
+        if (skillToUse == -1) {
+            skillToUse = 0;
+        }
+
+        Skill skill = enemyBeast.getSkills()[skillToUse];
+
+        // Calculate damage
+        int baseDamage = skill.calculateDamage();
+        double typeMultiplier = skill.type().getEffectivenessAgainst(playerBeast.getType());
+        int finalDamage = (int) Math.round(baseDamage * typeMultiplier);
+
+        // Messages
+        System.out.println("\nEnemy used " + skill.name() + "!");
+        String effectivenessMessage = skill.type().getEffectivenessMessage(playerBeast.getType());
+        if (!effectivenessMessage.isEmpty()) {
+            System.out.println(effectivenessMessage);
+        }
+        System.out.println("You took " + finalDamage + " damage!");
+        if (typeMultiplier != 1.0) {
+            System.out.println("(Damage modified by x" + typeMultiplier + ")");
+        }
+
+        // Apply damage and consume skill resources
+        playerBeast.takeDamage(finalDamage);
+        enemyBeast.useSkill(skillToUse);
+
+        // If player's current beast fainted
+        if (!playerBeast.isAlive()) {
+            System.out.println("\nYour " + playerBeast.getName() + " fainted!");
+
+            // If player has any alive beasts left, force a switch
+            if (player.hasAliveBeast()) {
+                System.out.println("Choose another Mecha Beast to continue the battle.");
+                switchBeast();
+                return false;
+            } else {
+                // No beasts left -> player loses the battle
+                System.out.println("All your Mecha Beasts have fainted. The match will restart.");
+                return true;
+            }
+        }
 
         return false;
     }
 
-
-    //Victory/defeat conditions
-    //ui ra
     private void displayBattleStatus(MechaBeast playerBeast, MechaBeast enemyBeast) {
         System.out.println("\n┌─ YOUR BEAST ─────────────────────────┐");
         System.out.println("│ " + playerBeast.getStatusBar());
@@ -297,7 +408,6 @@ public class Combat {
         System.out.println("└──────────────────────────────────────┘");
     }
 
-    //if e type ang 5 mao ni mo gawas
     private void displayEnemyInfo(MechaBeast enemy) {
         System.out.println("\n╔══ ENEMY INFO ══╗");
         System.out.println("Name: " + enemy.getName());
@@ -305,16 +415,16 @@ public class Combat {
         System.out.println("HP: " + enemy.getCurrentHp() + "/" + enemy.getMaxHp());
         System.out.println("Speed: " + enemy.getSpeed());
         System.out.println("\nSkills:");
-        Skill[] skills = enemy.getSkills();
+
+        Skill[] enemySkills = enemy.getSkills();
         for (int i = 0; i < 3; i++) {
-            if (skills[i] != null) {
-                System.out.println("- " + skills[i].getDescription());
+            if (enemySkills[i] != null) {
+                System.out.println("- " + enemySkills[i].getDescription());
             }
         }
         System.out.println("╚═══════════════╝");
-
     }
-    //if e type ang 6 mao ni mo gawas
+
     private void displayTypeChart() {
         System.out.println("\n╔════════════════ TYPE CHART ════════════════╗");
         System.out.println("║  SUPER EFFECTIVE (2x damage):              ║");
@@ -343,104 +453,101 @@ public class Combat {
         System.out.println("║ DARK    ← Fighting, Steel                  ║");
         System.out.println("║ STEEL   ← Fire, Earth                      ║");
         System.out.println("╚════════════════════════════════════════════╝");
-        System.out.println("\nTIP: Match your skill type to the enemy's");
+        System.out.println("\n💡 TIP: Match your skill type to the enemy's");
         System.out.println("         weakness for maximum damage!");
         pressEnterToContinue();
     }
-    private void pressEnterToContinue() {
-        System.out.println("\n[Press ENTER to continue]");
-        scanner.nextLine();
-    }
 
-    //Input validation
-    //kani ra gamita if mag input ug number
-    private int getIntInput(int max) {
-        while (true) {
-            try {
-                String input = scanner.nextLine();
-                int value = Integer.parseInt(input);
-                if (value >= 1 && value <= max) {
-                    return value;
-                }
-                System.out.print("Please enter a number between " + 1 + " and " + max + ": ");
-            } catch (NumberFormatException e) {
-
-                System.out.print("Invalid input. Please enter a number: ");
-            }
-        }
-    }
-
-
-    // Display skills for player
     private void displaySkills(MechaBeast beast) {
-        System.out.println("\n|| Available skills for " + beast.getName() + " ||");
+        System.out.println("\n" + beast.getName() + " TYPE: " + beast.getType().getDisplayName());
+        System.out.println("║ Available skills for " + beast.getName() + " ║");
+
         Skill[] skills = beast.getSkills();
 
         for (int i = 0; i < skills.length; i++) {
             Skill skill = skills[i];
 
-            if(skill == null) {
+            if (skill == null) {
                 System.out.println((i + 1) + ": ---");
                 continue;
             }
 
-            // get mana and cooldown info
-            int cd = beast.getSkillCooldown(i);
-            boolean onCooldown = cd > 0;
-            boolean hasMana = beast.getMana() >= skill.manaCost();
-            boolean canUse = hasMana && !onCooldown;
+            // Check skill availability
+            int cooldownTurns = beast.getSkillCooldown(i);
+            boolean isOnCooldown = cooldownTurns > 0;
+            boolean hasEnoughMana = beast.getMana() >= skill.manaCost();
+            boolean canUseSkill = hasEnoughMana && !isOnCooldown;
 
-
-            // display cooldown info
             String cooldownInfo = "";
-
-            if(onCooldown) {
-                cooldownInfo = " (Cooldown: " + cd + " more turns)";
+            if (isOnCooldown) {
+                cooldownInfo = " (Cooldown: " + cooldownTurns + " more turns)";
             }
 
-            // mana display
             String manaInfo = " | Mana: " + skill.manaCost();
 
-            //skill availability display
-            String status = "";
-
-            if(!canUse) {
-                if(onCooldown) {
-                    status = "[COOLDOWN]";
-                } else if (!hasMana) {
+            String status;
+            if (!canUseSkill) {
+                if (isOnCooldown) {
+                    status = " [COOLDOWN]";
+                } else {
                     status = " [INSUFFICIENT MANA]";
                 }
+            } else {
+                status = " [READY]";
             }
 
-            // final output
+            //skill information
             System.out.printf("%d: %s (%s) | Power: %d-%d%s%s %s%n",
-                    (i + 1), skill.name(), skill.type().getDisplayName(),
-                    skill.minPower(), skill.maxPower(),
-                    manaInfo, cooldownInfo, status);
+                    (i + 1),
+                    skill.name(),
+                    skill.type().getDisplayName(),
+                    skill.minPower(),
+                    skill.maxPower(),
+                    manaInfo,
+                    cooldownInfo,
+                    status
+            );
         }
-
-
-
     }
 
-    // TUTORIAL MODE METHODS
-
-    // Tutorial mode
     public void setTutorialMode() {
-        boolean matchOver = false;
-        do {
-            matchOver = begin();
+        boolean playerWon;
 
-            if(isTutorial && !matchOver) {
+        do {
+            playerWon = begin();
+
+            if (isTutorial && !playerWon) {
                 System.out.println("Match failed! Starting over...");
                 resetCombat();
             }
-        } while(isTutorial && !matchOver);
+        } while (isTutorial && !playerWon);
     }
 
-    // Resets combat until player wins
     private void resetCombat() {
         player.healAllBeasts();
         enemy.fullHeal();
+    }
+
+    private void pressEnterToContinue() {
+        System.out.println("\n[Press ENTER to continue]");
+        scanner.nextLine();
+    }
+
+    private int getValidIntInput(int max) {
+        while (true) {
+            try {
+                String input = scanner.nextLine();
+                int value = Integer.parseInt(input);
+
+                if (value >= 1 && value <= max) {
+                    return value;
+                }
+
+                System.out.print("Please enter a number between 1 and " + max + ": ");
+
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter a number: ");
+            }
+        }
     }
 }

@@ -43,10 +43,6 @@ public abstract class BattleEntity implements Damageable {
         return maxMana;
     }
 
-    public void setMana(int mana) {
-        this.mana = mana;
-    }
-
     @Override
     public void takeDamage(int damage) {
         currentHp -= damage;
@@ -62,20 +58,6 @@ public abstract class BattleEntity implements Damageable {
     public void fullHeal() {
         currentHp = maxHp;
         mana = maxMana;
-    }
-    
-    @Override
-    public void reduceMana(int amount) {
-        this.mana = Math.max(this.mana - amount, 0);
-    }
-
-    @Override
-    public void regainMana(int amount) {
-        this.mana = Math.min(this.mana + amount, this.maxMana);
-    }
-
-    public boolean hasEnoughMana(int amount) {
-        return this.mana >= amount;
     }
 
     public abstract String getStatusBar();

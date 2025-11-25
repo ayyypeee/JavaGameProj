@@ -1,13 +1,12 @@
 package Main;
-
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        Music.playBackground("src\\Main\\Music.wav", true);
 
-        // Welcome Banner
         System.out.println("╔════════════════════════════════════════╗");
         System.out.println("║       WELCOME TO DIGIWORLD RPG         ║");
         System.out.println("║                                        ║");
@@ -73,7 +72,7 @@ public class Main {
         int selection;
         for (selection = 1; selection <= 3; selection++) {
             System.out.println("\n╔══ SELECTION " + selection + "/3 ══╗");
-            int choice = -1;
+            int choice;
 
             while (true) {
                 System.out.print("Choose Mecha Beast " + selection + " (1-9): ");
@@ -188,4 +187,5 @@ public class Main {
 
 
     }
+
 }

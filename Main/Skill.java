@@ -1,19 +1,21 @@
-
 package Main;
 
 import java.util.Random;
 
 public class Skill {
-    private static final Random rand = new Random();
 
-    private final String name;
-    private final ElementType type;
-    private final int minPower;
-    private final int maxPower;
-    private final int manaCost;
-    private final int cooldown;
+    // Random number generator for damage calculation
+    private static final Random random = new Random();
 
-    public Skill(String name, ElementType type, int minPower, int maxPower, int manaCost, int cooldown) {
+    private final String name;          // Name of the skill
+    private final ElementType type;     // Element type
+    private final int minPower;         // Minimum damage
+    private final int maxPower;         // Maximum damage
+    private final int manaCost;         // How much mana it costs to use
+    private final int cooldown;         // How many turns before can use again
+
+    public Skill(String name, ElementType type, int minPower, int maxPower,
+                 int manaCost, int cooldown) {
         this.name = name;
         this.type = type;
         this.minPower = minPower;
@@ -22,12 +24,11 @@ public class Skill {
         this.cooldown = cooldown;
     }
 
-    // getter
     public String name() {
         return name;
     }
 
-    public ElementType type()  {
+    public ElementType type() {
         return type;
     }
 
@@ -42,22 +43,26 @@ public class Skill {
     public int manaCost() {
         return manaCost;
     }
-
     public int cooldown() {
         return cooldown;
     }
 
-
-    // random damage
     public int calculateDamage() {
-        if (maxPower <= minPower)
+
+        if (maxPower <= minPower) {
             return minPower;
-        return rand.nextInt(maxPower - minPower + 1) + minPower;
+        }
+
+        return random.nextInt(maxPower - minPower + 1) + minPower;
     }
 
     public String getDescription() {
         return String.format("%s (%s) | Power: %d-%d | Mana: %d | CD: %d",
-                name, type.getDisplayName(), minPower, maxPower, manaCost, cooldown);
+                name,
+                type.getDisplayName(),
+                minPower,
+                maxPower,
+                manaCost,
+                cooldown);
     }
-
 }

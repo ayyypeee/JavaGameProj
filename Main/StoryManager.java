@@ -160,7 +160,6 @@ public class StoryManager {
             playStage1Ending();
         } else {
             gameOver();
-            alphaBossWon = false;
             playAlphaBossBattle();
         }
     }
