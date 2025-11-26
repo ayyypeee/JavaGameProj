@@ -43,7 +43,7 @@ public class MechaBeastFactory {
                 900, 100, 250, 30);
         beast.addSkill(new Skill("Kong Fist", ElementType.NEUTRAL, 30, 35, 0, 0));
         beast.addSkill(new Skill("Mineral Bomb", ElementType.EARTH, 50, 100, 50, 1));
-        beast.addSkill(new Skill("Colossus Breaker", ElementType.EARTH, 130, 150, 100, 4));
+        beast.addSkill(new Skill("Colossus Breaker", ElementType.EARTH, 130, 150, 150, 4));
         return beast;
     }
 

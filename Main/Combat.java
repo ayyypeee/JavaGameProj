@@ -1,7 +1,9 @@
 package Main;
+
 import java.util.Scanner;
 
 public class Combat {
+
     private Scanner scanner;
     private Player player;
     private MechaBeast enemy;
@@ -10,66 +12,36 @@ public class Combat {
 
     public Combat(Player player, MechaBeast enemy, boolean isTutorial, String stageName) {
         this.scanner = new Scanner(System.in);
-        this.isTutorial = isTutorial;
         this.player = player;
-
-        if (stageName != null) {
-            this.stageName = stageName;
-        } else {
-            this.stageName = "";
-        }
-
-        this.enemy = prepareEnemy(enemy);  // Prepare enemy (nerf if tutorial)
+        this.isTutorial = isTutorial;
+        this.stageName = stageName != null ? stageName : "";
+        this.enemy = prepareEnemy(enemy);
     }
-
 
     private MechaBeast prepareEnemy(MechaBeast originalEnemy) {
         try {
+            if (!isTutorial) return originalEnemy.copy();
 
-            if (!isTutorial) {
-                return originalEnemy.copy();
-            }
-
-            // Divide stats by 3 to make it easier for beginners
             int tutorialHp = Math.max(1, originalEnemy.getMaxHp() / 3);
             int tutorialSpeed = Math.max(1, originalEnemy.getSpeed() - 20);
             int tutorialMana = Math.max(1, originalEnemy.getMaxMana() / 3);
             int tutorialManaRegen = 5;
 
-            // Create the nerfed beast with reduced stats
-            MechaBeast nerfedEnemy = new MechaBeast(
-                    originalEnemy.getName(),
-                    originalEnemy.getType(),
-                    originalEnemy.getHenshin(),
-                    tutorialHp,
-                    tutorialSpeed,
-                    tutorialMana,
-                    tutorialManaRegen
-            );
+            MechaBeast nerfedEnemy = new MechaBeast(originalEnemy.getName(), originalEnemy.getType(), originalEnemy.getHenshin(),
+                    tutorialHp, tutorialSpeed, tutorialMana, tutorialManaRegen);
 
-            // Copy skills but make them weaker
             Skill[] originalSkills = originalEnemy.getSkills();
             if (originalSkills != null) {
                 for (Skill skill : originalSkills) {
                     if (skill == null) continue;
-
-                    // Reduce skill power for tutorial
                     int weakMinPower = Math.max(1, (int) Math.round(skill.minPower() * 0.5));
                     int weakMaxPower = Math.max(weakMinPower, (int) Math.round(skill.maxPower() * 0.5));
                     int weakManaCost = Math.max(0, skill.manaCost() / 2);
-
-                    nerfedEnemy.addSkill(new Skill(
-                            skill.name(),
-                            skill.type(),
-                            weakMinPower,
-                            weakMaxPower,
-                            weakManaCost,
-                            skill.cooldown()
-                    ));
+                    nerfedEnemy.addSkill(new Skill(skill.name(), skill.type(), weakMinPower, weakMaxPower, weakManaCost, skill.cooldown()));
                 }
             }
-            return nerfedEnemy;
 
+            return nerfedEnemy;
         } catch (Exception e) {
             System.out.println("Error preparing enemy: " + e.getMessage());
             return originalEnemy.copy();
@@ -77,82 +49,47 @@ public class Combat {
     }
 
     public boolean begin() {
-
         System.out.println("\n╔════════════════════════════════════════╗");
-        System.out.println("║              BATTLE START              ║");
+        System.out.println("║            BATTLE START                ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        if (player != null) player.healAllBeasts();
-        if (enemy != null) enemy.fullHeal();
+        player.healAllBeasts();
+        enemy.fullHeal();
 
-        // Let player choose starting beast
-        assert player != null;
         MechaBeast[] playerBeasts = player.getMechaBeasts();
         int totalBeasts = player.getBeastCount();
-        if (isTutorial) {
-            System.out.println("\n📖 TUTORIAL: You've encountered a Mecha Beast!");
-            System.out.println("Choose your Mecha Beast and press the skill number to attack.");
-        }
 
-        if (totalBeasts > 1) {
-            showBeastSelectionMenu(playerBeasts, totalBeasts);
-        }
+        if (totalBeasts > 1) showBeastSelectionMenu(playerBeasts, totalBeasts);
 
-        // announce player's henshin if available
         MechaBeast newBeast = player.getCurrentBeast();
         if (newBeast != null && newBeast.getHenshin() != null && !newBeast.getHenshin().isEmpty()) {
-            System.out.println("⚡ Announcer: " + newBeast.getHenshin().toUpperCase() + "! ⚡"); } // announce enemy henshin if available
+            System.out.println("⚡ Announcer: " + newBeast.getHenshin().toUpperCase() + "! ⚡");
+        }
+
         scanner.nextLine();
-
-
         int turnNumber = 1;
         boolean playerGoesFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
 
         while (player.hasAliveBeast() && enemy.getCurrentHp() > 0) {
-
-            // Display current turn number and stage
-            String stage;
-            if (stageName.isEmpty()) {
-                stage = "";
-            } else {
-                stage = stageName + " - ";
-            }
-
+            String stage = stageName.isEmpty() ? "" : stageName + " - ";
             System.out.println("\n═══ " + stage + "TURN " + turnNumber + " ═══");
-
             displayBattleStatus(player.getCurrentBeast(), enemy);
 
-            // Determine turn order based on speed
             if (playerGoesFirst) {
-
-                if (executePlayerTurn(player.getCurrentBeast(), enemy)) {
-                    return true;
-                }
-
-                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) {
-                    return false;
-                }
+                if (executePlayerTurn(player.getCurrentBeast(), enemy)) return true;
+                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) return false;
             } else {
-
-                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) {
-                    return false;
-                }
-
-                if (executePlayerTurn(player.getCurrentBeast(), enemy)) {
-                    return true;
-                }
+                if (executeEnemyTurn(player.getCurrentBeast(), enemy)) return false;
+                if (executePlayerTurn(player.getCurrentBeast(), enemy)) return true;
             }
 
             player.getCurrentBeast().reduceCooldowns();
             enemy.reduceCooldowns();
-
             player.getCurrentBeast().regenerateMana();
             enemy.regenerateMana();
-
             turnNumber++;
         }
 
-        // Return true if player has alive beasts (player wins)
         return player.hasAliveBeast();
     }
 
