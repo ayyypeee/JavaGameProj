@@ -5,7 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Music.playBackground("src\\Main\\Music.wav", true);
+        //Music.playBackground("src\\Main\\Music.wav", true);
 
         System.out.println("╔════════════════════════════════════════╗");
         System.out.println("║       WELCOME TO DIGIWORLD RPG         ║");

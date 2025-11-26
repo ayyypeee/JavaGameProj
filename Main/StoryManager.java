@@ -30,7 +30,7 @@ public class StoryManager {
         System.out.println("\n" + player.getName() + ": Thanks for the explanation, Professor,");
         System.out.println("but may I know what is the reason the government funded this game?");
         System.out.println();
-        System.out.println("General Edrian: I shall be the one to answer that question, " + player.getName() + ".");
+        System.out.println("General Edrian: I shall be the one to answer that question, Mr." + player.getName() + ".");
         System.out.println("I was intrigued by gaming. Seeing players think like chess masters");
         System.out.println("or generals and coordinate their movements to win gave me an idea.");
         System.out.println();
@@ -79,17 +79,17 @@ public class StoryManager {
         System.out.println();
         System.out.println(player.getName() + ": Hello? Anyone here?");
         System.out.println();
-        System.out.println("Chief Rei: Welcome, traveler. I am Chief Rei, guardian of this village.");
+        System.out.println("Chief Kyle: Welcome, traveler. I am Chief Rei, guardian of this village.");
         System.out.println("What is it you seek?");
         System.out.println();
         System.out.println(player.getName() + ": I was told there is an Alpha Beast here.");
         System.out.println();
-        System.out.println("Chief Rei (serious): That is true. But tell me... are you a challenger,");
+        System.out.println("Chief Kyle (serious): That is true. But tell me... are you a challenger,");
         System.out.println("or just another treasure hunter?");
         System.out.println();
         System.out.println(player.getName() + ": I... I guess I am a challenger.");
         System.out.println();
-        System.out.println("Chief Rei (nodding): Then follow the Mystic Forest. The path will");
+        System.out.println("Chief kyle (nodding): Then follow the Mystic Forest. The path will");
         System.out.println("test you before you reach the Alpha. Be prepared.");
         System.out.println();
         System.out.println(player.getName() + ": Thank you, Chief.");
@@ -328,7 +328,7 @@ public class StoryManager {
         System.out.println();
         System.out.println(player.getName() + ": Who are you!?");
         System.out.println();
-        System.out.println("???: Call me Glitch. I'm the real-world savior.");
+        System.out.println("???: I am Khai, known as The Glitch, the savior of the real world");
         System.out.println("If you win, I'll stop. If I win, I want your autograph.");
         System.out.println();
         System.out.println(player.getName() + ": Let's do this then!");

@@ -89,13 +89,21 @@ public class Combat {
         assert player != null;
         MechaBeast[] playerBeasts = player.getMechaBeasts();
         int totalBeasts = player.getBeastCount();
+        if (isTutorial) {
+            System.out.println("\n📖 TUTORIAL: You've encountered a Mecha Beast!");
+            System.out.println("Choose your Mecha Beast and press the skill number to attack.");
+        }
 
         if (totalBeasts > 1) {
             showBeastSelectionMenu(playerBeasts, totalBeasts);
         }
 
-        System.out.println("\nYou sent out " + player.getCurrentBeast().getName() + "!");
+        // announce player's henshin if available
+        MechaBeast newBeast = player.getCurrentBeast();
+        if (newBeast != null && newBeast.getHenshin() != null && !newBeast.getHenshin().isEmpty()) {
+            System.out.println("⚡ Announcer: " + newBeast.getHenshin().toUpperCase() + "! ⚡"); } // announce enemy henshin if available
         scanner.nextLine();
+
 
         int turnNumber = 1;
         boolean playerGoesFirst = player.getCurrentBeast().getSpeed() >= enemy.getSpeed();
