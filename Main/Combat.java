@@ -14,7 +14,12 @@ public class Combat {
         this.scanner = new Scanner(System.in);
         this.player = player;
         this.isTutorial = isTutorial;
-        this.stageName = stageName != null ? stageName : "";
+        if (stageName != null) {
+            this.stageName = stageName;
+        } else {
+            this.stageName = "";
+        }
+
         this.enemy = prepareEnemy(enemy);
     }
 
@@ -104,7 +109,13 @@ public class Combat {
                 continue;
             }
 
-            String statusFlag = beast.isAlive() ? "" : " (FAINTED)";
+            String statusFlag;
+            if (beast.isAlive()) {
+                statusFlag = "";
+            } else {
+                statusFlag = " (FAINTED)";
+            }
+
 
             System.out.printf("%d: %s (%s)%s (HP: %d/%d | Speed: %d | Mana: %d)%n",
                     (i + 1),
