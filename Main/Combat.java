@@ -328,7 +328,7 @@ public class Combat {
         }
         System.out.println("You took " + finalDamage + " damage!");
         if (typeMultiplier != 1.0) {
-            System.out.println("(Damage modified by x" + typeMultiplier + ")");
+            System.out.println("   (Base: " + baseDamage + " × " + typeMultiplier + "x type bonus)");
         }
 
         // Apply damage and consume skill resources

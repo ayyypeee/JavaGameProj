@@ -8,10 +8,8 @@ public class Main {
         //Music.playBackground("src\\Main\\Music.wav", true);
 
          System.out.println();
-        System.out.println(GREEN+"                           WELCOME TO"+RESET);
+        System.out.println(CYAN+"                           WELCOME TO"+RESET);
         System.out.println();
-
-        // Big "DIGIWORLD" in cyan (6-line block)
         System.out.println(CYAN +
                 "██████╗ ██╗ ██████╗ ██╗██╗    ██╗ ██████╗ ██████╗ ██╗     ██████╗ \n" +
                 "██╔══██╗██║██╔════╝ ██║██║    ██║██╔═══██╗██╔══██╗██║     ██╔══██╗\n" +
@@ -21,7 +19,7 @@ public class Main {
                 "╚═════╝ ╚═╝ ╚═════╝ ╚═╝ ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═════╝ \n" +
                 RESET);
 
-        System.out.print("Enter your champion name: ");
+        System.out.print(CYAN+"Enter your champion name: ");
         String playerName = scanner.nextLine().trim();
         if (playerName.isEmpty()) {
             playerName = "Champion";
@@ -30,7 +28,7 @@ public class Main {
         Player player = new Player(playerName);
         System.out.println("\nWelcome, " + playerName + "!");
         System.out.println("Preparing your journey...\n");
-        System.out.println("[Press ENTER to continue]");
+        System.out.println("[Press ENTER to continue]"+RESET);
         scanner.nextLine();
 
         StoryManager storyManager = new StoryManager(player);
@@ -196,6 +194,5 @@ public class Main {
     
     public static final String RESET  = "\u001B[0m";
     public static final String CYAN   = "\u001B[36m";
-    public static final String GREEN = "\u001B[32m";
 
 }
